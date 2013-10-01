@@ -190,28 +190,28 @@
       var modBottom = $("#"+keys[i]).hasClass("bh");
       
       if((e.clientX >= leftCatchA) && (e.clientX <= leftCatchB)) {
-        if((e.clientY >= posses[keys[i]].top)&&(e.clientY <= (posses[keys[i]].top+posses[keys[i]].height))) {
+        if((e.clientY >= posses[keys[i]].top+lead)&&(e.clientY <= (posses[keys[i]].top+posses[keys[i]].height-lead))) {
           $("#"+keys[i]).addClass("lh");
           modLeft = false;
         }
       }
       
       if((e.clientX >= rightCatchA) && (e.clientX <= rightCatchB)) {
-        if((e.clientY >= posses[keys[i]].top)&&(e.clientY <= (posses[keys[i]].top+posses[keys[i]].height))) {
+        if((e.clientY >= posses[keys[i]].top+lead)&&(e.clientY <= (posses[keys[i]].top+posses[keys[i]].height-lead))) {
           $("#"+keys[i]).addClass("rh");
           modRight = false;
         }
       }
 
       if((e.clientY >= topCatchA) && (e.clientY <= topCatchB)) {
-        if((e.clientX >= posses[keys[i]].left)&&(e.clientX <= (posses[keys[i]].left+posses[keys[i]].width))) {
+        if((e.clientX >= posses[keys[i]].left+lead)&&(e.clientX <= (posses[keys[i]].left+posses[keys[i]].width-lead))) {
           $("#"+keys[i]).addClass("th");
           modTop = false;
         }
       }
        
       if((e.clientY >= bottomCatchA) && (e.clientY <= bottomCatchB)) {
-        if((e.clientX >= posses[keys[i]].left)&&(e.clientX <= (posses[keys[i]].left+posses[keys[i]].width))) {
+        if((e.clientX >= posses[keys[i]].left+lead)&&(e.clientX <= (posses[keys[i]].left+posses[keys[i]].width-lead))) {
           $("#"+keys[i]).addClass("bh");
           modBottom = false;
         }
