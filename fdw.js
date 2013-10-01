@@ -247,16 +247,19 @@
     
     $(elementToDrag).fadeTo(100,1);
    
-    var modLeft = $("#"+keys[i]).hasClass("lh");
-    var modRight = $("#"+keys[i]).hasClass("rh");
-    var modTop = $("#"+keys[i]).hasClass("th");
-    var modBottom = $("#"+keys[i]).hasClass("bh");
-    
-    if(modLeft) $("#"+keys[i]).removeClass("lh");
-    if(modRight) $("#"+keys[i]).removeClass("rh");
-    if(modTop) $("#"+keys[i]).removeClass("th");
-    if(modBottom) $("#"+keys[i]).removeClass("bh");   
-    
+    var keys = Object.keys(posses);
+    //console.log(JSON.stringify(posses));
+    for(var i in keys) {   
+      var modLeft = $("#"+keys[i]).hasClass("lh");
+      var modRight = $("#"+keys[i]).hasClass("rh");
+      var modTop = $("#"+keys[i]).hasClass("th");
+      var modBottom = $("#"+keys[i]).hasClass("bh");
+      
+      if(modLeft) $("#"+keys[i]).removeClass("lh");
+      if(modRight) $("#"+keys[i]).removeClass("rh");
+      if(modTop) $("#"+keys[i]).removeClass("th");
+      if(modBottom) $("#"+keys[i]).removeClass("bh");   
+    }
     //header.parentNode.style.zIndex = 4000;
     
     // Unregister the capturing event handlers.
