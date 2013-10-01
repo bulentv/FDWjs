@@ -1,8 +1,19 @@
-(function(window,undefined) {
-  
+
+(function(window,$,undefined) {
+  var posses = {};
   
   var topZIndex = 1000;
   function makeDraggable(el) {
+    
+    var id = Math.round(Math.random()*1000000);
+    $(el).attr("id",id);
+    var pos = $(el).position();
+    posses[id] = {
+      left:parseInt(pos.left),
+      top:parseInt(pos.top),
+      width:parseInt($(el).width()),
+      height:parseInt($(el).height())
+    };
     
     var header = document.createElement("div");
     header.setAttribute("class","header");
@@ -46,10 +57,24 @@
  **/
   function downHandler(event) {
     
-    this.parentNode.style.zIndex = ++topZIndex;
+    
+    
     
     
     var elementToDrag = this.parentNode;
+    elementToDrag.style.zIndex = ++topZIndex;
+    
+    $(elementToDrag).fadeTo(100,0.5);
+    
+    var id = elementToDrag.getAttribute("id");
+    var pos = $(elementToDrag).position();
+    posses[parseInt(id)] = {
+      left:parseInt(pos.left),
+      top:parseInt(pos.top),
+      width:parseInt($(elementToDrag).width()),
+      height:parseInt($(elementToDrag).height())
+    };
+    
     // The mouse position (in window coordinates)
     // at which the drag begins 
     var startX = event.clientX, startY = event.clientY;    
@@ -60,6 +85,7 @@
     // document body.
     var origX = elementToDrag.offsetLeft, origY = elementToDrag.offsetTop ;
     
+ 
     // Even though the coordinates are computed in different 
     // coordinate systems, we can still compute the difference between them
     // and use it in the moveHandler() function.  This works because
@@ -132,6 +158,76 @@
     
     elementToDrag.style.top = newTop + "px";
     
+    var pos = $(elementToDrag).position();
+    posses[id] = {
+      left:parseInt(pos.left),
+      top:parseInt(pos.top),
+      width:parseInt($(elementToDrag).width()),
+      height:parseInt($(elementToDrag).height())
+    };    
+    
+
+    var lead = 10;
+    var keys = Object.keys(posses);
+    //console.log(JSON.stringify(posses));
+    for(var i in keys) {
+      
+      if(keys[i] == id) continue;
+
+      var leftCatchA = posses[keys[i]].left-lead;
+      var leftCatchB = leftCatchA + lead + lead
+      var rightCatchA = posses[keys[i]].left + posses[keys[i]].width - lead;
+      var rightCatchB = rightCatchA + lead + lead;
+      var topCatchA = posses[keys[i]].top - lead;
+      var topCatchB = topCatchA + lead + lead;
+      var bottomCatchA = posses[keys[i]].top + posses[keys[i]].height - lead;
+      var bottomCatchB = bottomCatchA + lead + lead;
+      
+      var hitV=false;
+      
+      var modLeft = $("#"+keys[i]).hasClass("lh");
+      var modRight = $("#"+keys[i]).hasClass("rh");
+      var modTop = $("#"+keys[i]).hasClass("th");
+      var modBottom = $("#"+keys[i]).hasClass("bh");
+      
+      if((e.clientX >= leftCatchA) && (e.clientX <= leftCatchB)) {
+        if((e.clientY >= posses[keys[i]].top)&&(e.clientY <= (posses[keys[i]].top+posses[keys[i]].height))) {
+          $("#"+keys[i]).addClass("lh");
+          modLeft = false;
+        }
+      }
+      
+      if((e.clientX >= rightCatchA) && (e.clientX <= rightCatchB)) {
+        if((e.clientY >= posses[keys[i]].top)&&(e.clientY <= (posses[keys[i]].top+posses[keys[i]].height))) {
+          $("#"+keys[i]).addClass("rh");
+          modRight = false;
+        }
+      }
+
+      if((e.clientY >= topCatchA) && (e.clientY <= topCatchB)) {
+        if((e.clientX >= posses[keys[i]].left)&&(e.clientX <= (posses[keys[i]].left+posses[keys[i]].width))) {
+          $("#"+keys[i]).addClass("th");
+          modTop = false;
+        }
+      }
+       
+      if((e.clientY >= bottomCatchA) && (e.clientY <= bottomCatchB)) {
+        if((e.clientX >= posses[keys[i]].left)&&(e.clientX <= (posses[keys[i]].left+posses[keys[i]].width))) {
+          $("#"+keys[i]).addClass("bh");
+          modBottom = false;
+        }
+      }
+      
+      
+      if(modLeft) $("#"+keys[i]).removeClass("lh");
+      if(modRight) $("#"+keys[i]).removeClass("rh");
+      if(modTop) $("#"+keys[i]).removeClass("th");
+      if(modBottom) $("#"+keys[i]).removeClass("bh");
+      
+      
+    }
+      
+    
     
     // And don't let anyone else see this event.
     if (e.stopPropagation) e.stopPropagation();  // DOM Level 2
@@ -144,13 +240,15 @@
      * occurs at the end of a drag.
      **/
   function upHandler(e) {
-    if(e.which === 0) {
-      return upHandler(e);
-    }
+//    if(e.which === 0) {
+//      return upHandler(e);
+//    }
 
     if (!e) e = window.event;  // IE Event Model
     
-    var header = document.elementFromPoint(e.clientX,e.clientY);
+    $(elementToDrag).fadeTo(100,1);
+   
+    
     //header.parentNode.style.zIndex = 4000;
     
     // Unregister the capturing event handlers.
@@ -206,7 +304,7 @@
     }
     return ret;
   };
-})(window);
+})(window,$);
 
 I().extend("draggable2", function() {
     while((el = getOne()))
