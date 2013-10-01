@@ -7,4 +7,5 @@ This is my first project on GH. I will try to create a docking/floating windows 
 
 The project is open for pull requests &amp; contributions.
 
-Start editing the code <a target="_top" href="http://jsbin.com/azOBEhU/4/edit">here</s>
+<a href="http://www.bvnet.net/demo/FDWjs/">DEMO</a>
+===================================================
