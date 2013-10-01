@@ -1,6 +1,7 @@
 (function(window,undefined) {
   
   
+  var topZIndex = 1000;
   function makeDraggable(el) {
     
     var header = document.createElement("div");
@@ -13,6 +14,9 @@
       el.insertBefore(header,el.firstChild);
     
     header.addEventListener("mousedown",downHandler);
+    el.addEventListener("mousedown", function(e) {
+      this.style.zIndex = ++topZIndex;
+    }); 
     
   }
   
@@ -40,11 +44,9 @@
  *
  *   event: the Event object for the mousedown event.
  **/
-  var topZIndex = 1000;
   function downHandler(event) {
     
     this.parentNode.style.zIndex = ++topZIndex;
-    I("#debug").text(topZIndex);
     
     
     var elementToDrag = this.parentNode;
