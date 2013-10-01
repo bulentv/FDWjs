@@ -142,6 +142,10 @@
      * occurs at the end of a drag.
      **/
   function upHandler(e) {
+    if(e.which === 0) {
+      return upHandler(e);
+    }
+
     if (!e) e = window.event;  // IE Event Model
     
     var header = document.elementFromPoint(e.clientX,e.clientY);
