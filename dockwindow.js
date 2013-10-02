@@ -5,9 +5,25 @@
     this._parent = options.parent;
     self._zindex = -1;
 
-    var header = $("<div />")
-    .addClass("header")
-    .css({display:"none"});
+
+    self.isDragActivated = false;
+    self.cursorType = "";
+    self.isCursorOnBorder = false;
+
+    self.moving = false;
+
+    var title = options.title || "Window";
+    var header = $("<div><div class=\"title\">"+title+"</div></div>")
+    .addClass("header");
+
+    header.on("mouseenter", function(e) {
+      if(self.isDragActivated) return;
+      $(this).addClass("active-header");
+    });
+    header.on("mouseleave", function(e) {
+      if(self.moving) return;
+      $(this).removeClass("active-header");
+    });
 
     this._wnd = $("<div />")
     .addClass("wnd")
@@ -24,10 +40,8 @@
 
     .on({
       "mouseenter": function(e) {
-        header.stop().fadeIn(100);
       },
       "mouseleave": function(e) {
-        header.stop().fadeOut(100);
       }
     });
 
@@ -36,17 +50,20 @@
     };
 
     this._triggerMoveEvent = function(detail){
-        var event = new CustomEvent("move",{
-          detail:detail
-        });
-        this._triggerEvent(event);
+      var event = new CustomEvent("move",{
+        detail:detail
+      });
+      this._triggerEvent(event);
     };
+
     // Handle clicks on the header (mousedown)
     // We will start moving the window as long as the mouse remain down
     header.on("mousedown", function () {
 
       var wnd = self._wnd;
       self.bringToFront();
+
+      self.moving = true;
 
       var offset = wnd.offset(),
       deltaX = event.clientX - offset.left,
@@ -104,6 +121,8 @@
 
         if (!e) e = window.event;  // IE Event Model
 
+        self.moving = false;
+
         // Unregister the capturing event handlers.
         document.removeEventListener("mouseup", upHandler, true);
         document.removeEventListener("mousemove", moveHandler, true);
@@ -114,6 +133,13 @@
     });
   }
 
+  dockWindow.prototype.resizeState = function(state) {
+    if(!state) {
+      return this._resizeState;
+    }else{
+      this._resizeState = state;
+    }
+  };
   dockWindow.prototype.$ = function() {
     return this._wnd;
   };
@@ -133,5 +159,149 @@
   dockWindow.prototype.on = function(eventName, fn) {
     this.$().get()[0].addEventListener(eventName, fn);
   };
+  dockWindow.prototype.activateResize = function() {
+    this.isDragActivated = true;
+  };
+
+  dockWindow.prototype.deActivateResize = function() {
+    //this is an onmouseup event
+    this.isDragActivated = false;
+    this.isCursorOnBorder = false;
+    this.cursorType = "default";
+    this.$().css({"cursor":this.cursorType});
+  }
+
+
+  //this is an onmousemove event called from changeCursot()
+  dockWindow.prototype.resize = function(e) {
+    if(this.isDragActivated){
+
+      var $e = this.$();
+
+      var element = this.$().get()[0];
+      var curevent=e;
+      //coordiantes of the event position
+      var x = curevent.clientX;
+      var y = curevent.clientY;
+      var element = this.$().get()[0];//document.getElementById(elementID);
+
+      //top left positions of the div element
+      var topLeftX = element.offsetLeft;
+      var topLeftY = element.offsetTop;
+
+      //width and height of the element
+      var width = element.offsetWidth;
+      var height = element.offsetHeight;
+
+      //get the cursor sytle [e,w,n,s,ne,nw,se,sw]
+      var cursor = this.cursorType.substring(0,this.cursorType.indexOf('-'));
+
+      var pos = $e.position(),
+      width = $e.width(),
+      height = $e.height();
+      if(cursor.indexOf('e')!=-1)
+      {
+        $e.css({"width":e.clientX-pos.left+"px"});
+      }
+      if(cursor.indexOf('s')!=-1)
+      {
+        $e.css({"height":e.clientY-pos.top+"px"});
+      }
+      if(cursor.indexOf('w')!=-1)
+      {
+        if(e.clientX<=pos.left+width) {
+          $e.css({"left":e.clientX+"px"});
+          $e.css({"width":Math.max((width+pos.left-e.clientX),5)+"px"});
+        }
+      }
+      if(cursor.indexOf('n')!=-1)
+      {
+        if(e.clientY<=pos.top+height) {
+          $e.css({"top":e.clientY+"px"});
+          $e.css({"height":Math.max((height+pos.top-e.clientY),5)+"px"});
+        }
+      }
+    }
+    else {
+      this.changeCursor(e);
+    }
+  };
+
+
+  dockWindow.prototype.changeCursor = function(e) {
+    //this is an onmousemove event
+
+    var cursorType = "default";
+
+    //code start for changing the cursor
+    var element = this.$().get()[0];//document.getElementById(elementID);
+    var topLeftX = element.offsetLeft;
+    var topLeftY = element.offsetTop;
+    var bottomRightX = topLeftX+element.offsetWidth;
+    var bottomRightY = topLeftY+element.offsetHeight;
+    var curevent=e;
+    var x = curevent.clientX;
+    var y = curevent.clientY;
+    //window.status = topLeftX +"--"+topLeftY+"--"+bottomRightX+"--"+bottomRightY+"--"+x+"--"+y+"--"+isDragActivated;
+
+    //change the cursor style when it is on the border or even at a distance of 8 pixels around the border
+    if(x >= topLeftX-8 && x <= topLeftX+8){
+      if(y >= topLeftY-8 && y <= topLeftY+8 ){
+        isCursorOnBorder = true;
+        cursorType = "nw-resize";
+      }
+      else if(y >= bottomRightY-8 && y <= bottomRightY+8){
+        isCursorOnBorder = true;
+        cursorType = "sw-resize";
+      }
+      else if(y > topLeftY-8 && y < bottomRightY+8){
+        isCursorOnBorder = true;
+        cursorType = "w-resize";
+      }
+      else{
+        //       isCursorOnBorder = false;
+        //       cursorType = "default";
+      }
+    }
+    else if(x >= bottomRightX-8 && x <= bottomRightX+8){
+      if(y >= topLeftY-8 && y <= topLeftY+8){
+        isCursorOnBorder = true;
+        cursorType = "ne-resize";
+      }
+      else if(y >= bottomRightY-8 && y <= bottomRightY+8){
+        isCursorOnBorder = true;
+        cursorType = "se-resize";
+      }
+      else if(y > topLeftY-8 && y < bottomRightY+8){
+        isCursorOnBorder = true;
+        cursorType = "e-resize";
+      }
+      else{
+        //       isCursorOnBorder = false;
+        //       cursorType = "default";
+      }
+    }
+    else if(x > topLeftX-8 && x < bottomRightX+8){
+      if(y >= bottomRightY-8 && y <= bottomRightY+8){
+        isCursorOnBorder = true;
+        cursorType = "s-resize";
+      }
+      else if(y >= topLeftY-8 && y <= topLeftY+8){
+        isCursorOnBorder = true;
+        cursorType = "n-resize";
+      }
+      else{
+        //        isCursorOnBorder = false;
+        //        cursorType = "default";
+      }
+    }
+
+    this.cursorType = cursorType;
+    this.$().css({"cursor":this.cursorType});
+    //end of code for changing the cursor
+
+    //    resizeDiv(elementID,e);
+  }
+
   bulo.DockWindow = dockWindow;
 })(jQuery,bulo);
