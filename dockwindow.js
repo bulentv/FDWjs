@@ -45,6 +45,8 @@
       }
     });
 
+    header.css({top:"0px"});
+
     this._triggerEvent = function(event){
       this.$().get()[0].dispatchEvent(event);
     };
@@ -58,12 +60,16 @@
 
     // Handle clicks on the header (mousedown)
     // We will start moving the window as long as the mouse remain down
-    header.on("mousedown", function () {
+    header.on("mousedown", function (event) {
 
       var wnd = self._wnd;
       self.bringToFront();
 
       self.moving = true;
+
+      self.$().fadeTo(60,0.7);
+      self.$().addClass("hilight_frame");
+
 
       var offset = wnd.offset(),
       deltaX = event.clientX - offset.left,
@@ -121,6 +127,8 @@
 
         if (!e) e = window.event;  // IE Event Model
 
+        self.$().fadeTo(300,1);
+        self.$().removeClass("hilight_frame");
         self.moving = false;
 
         // Unregister the capturing event handlers.
@@ -221,6 +229,9 @@
           $e.css({"height":Math.max((height+pos.top-e.clientY),5)+"px"});
         }
       }
+
+      this._triggerEvent(new CustomEvent("resize"));
+
     }
     else {
       this.changeCursor(e);
