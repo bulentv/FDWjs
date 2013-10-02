@@ -1,11 +1,24 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // TEST CODE
 $(document).ready( function () {
   var mgr = new bulo.WindowMgr();
-  mgr.addWindow({left:"100px",top:"100px"});
-  mgr.addWindow({left:"200px",top:"200px"});
-  mgr.addWindow({left:"300px",top:"300px"});
-  mgr.addWindow({left:"400px",top:"400px"});
-  mgr.addWindow({left:"500px",top:"500px"});
+  mgr.addWindow({title:"First Panel",left:"100px",top:"100px",width:"300px",height:"200px"});
+  mgr.addWindow({title:"Second Panel",left:"100px",top:"400px",width:"400px",height:"200px"});
+  mgr.addWindow({title:"Third Panel",left:"500px",top:"150px",width:"250px",height:"200px"});
 });
 
 (function($,undefined) {
@@ -26,6 +39,8 @@ $(document).ready( function () {
     var self = this,
     uidPrefix = "bulownd",
     uidCounter = 10000;
+    self._sizing = false;
+
 
 
     self._makeUID = function() {
@@ -38,6 +53,18 @@ $(document).ready( function () {
     self._windowObjs = [];
 
     self._viewport = _createViewport(self._makeUID());
+    self._viewport.bind("mousemove", function(e) {
+      for(var i in self._windowObjs) {
+        var wnd = self._windowObjs[i];
+        wnd.resize(e);
+      }
+    });
+    self._viewport.bind("mouseup", function(e) {
+      for(var i in self._windowObjs) {
+        var wnd = self._windowObjs[i];
+        wnd.deActivateResize(e);
+      }
+    });
 
   }
 
@@ -59,7 +86,16 @@ $(document).ready( function () {
     self._windowObjs.push(wnd);
 
     self._viewport.append(wnd.$());
+    wnd.on("mousedown", function(e) {
+        wnd.activateResize(e);   
+      // We've handled this event. Don't let anybody else see it.  
+      if (e.stopPropagation) e.stopPropagation();  // DOM Level 2
+      else e.cancelBubble = true;                      // IE
 
+      // Now prevent any default action.
+      if (e.preventDefault) e.preventDefault();   // DOM Level 2
+      else e.returnValue = false;                     // IE
+    });
     wnd.on("move",function(ev){
 
       var mouseX = ev.detail.mouseX,
@@ -68,7 +104,7 @@ $(document).ready( function () {
           cur_wnd = null;
 
 
-      // walk though all floating windows
+      // walk though all our windows
       for(var i in self._windowObjs) {
         
         // get the props of the current one
