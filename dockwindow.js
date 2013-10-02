@@ -9,7 +9,7 @@
     .addClass("header")
     .css({display:"none"});
 
-    self._wnd = $("<div />")
+    this._wnd = $("<div />")
     .addClass("wnd")
     .attr("id",options.id)
 
@@ -31,6 +31,16 @@
       }
     });
 
+    this._triggerEvent = function(event){
+      this.$().get()[0].dispatchEvent(event);
+    };
+
+    this._triggerMoveEvent = function(detail){
+        var event = new CustomEvent("move",{
+          detail:detail
+        });
+        this._triggerEvent(event);
+    };
     // Handle clicks on the header (mousedown)
     // We will start moving the window as long as the mouse remain down
     header.on("mousedown", function () {
@@ -76,9 +86,10 @@
         // move the window to the calculated coordinates
         wnd.css({ left: newLeft + "px", top: newTop + "px"});
 
-        if(self.onMove) {
-          self.onMove(self,newLeft,newTop,e.clientX,e.clientY);
-        }
+        self._triggerMoveEvent({
+          mouseX:e.clientX,
+          mouseY:e.clientY
+        });
 
         // And don't let anyone else see this event.
         if (e.stopPropagation) e.stopPropagation();  // DOM Level 2
@@ -97,33 +108,30 @@
         document.removeEventListener("mouseup", upHandler, true);
         document.removeEventListener("mousemove", moveHandler, true);
 
-        if(self.onAfterMove){
-          self.onAfterMove();
-        }
+        self._triggerEvent(new CustomEvent("aftermove"));
 
       }
     });
   }
 
-  dockWindow.prototype.getElement = function() {
+  dockWindow.prototype.$ = function() {
     return this._wnd;
   };
 
   dockWindow.prototype.hasHigherZ = function(other){
-    return this._wnd.css("z-index") > other.getElement().css("z-index");
+    return this._wnd.css("z-index") > other.$().css("z-index");
   };
 
   dockWindow.prototype.isTheSame = function(other){
-    return other && (this._wnd.attr("id") == other.getElement().attr("id"));
+    return other && (this._wnd.attr("id") == other.$().attr("id"));
   };
   dockWindow.prototype.bringToFront = function() {
     this._zindex = this._parent.incrZIndex();
-    this.getElement().css({"z-index":this._zindex});
+    this.$().css({"z-index":this._zindex});
   };
 
   dockWindow.prototype.on = function(eventName, fn) {
-    if(eventName == "move") this.onMove = fn;
-    if(eventName == "aftermove") this.onAfterMove = fn;
+    this.$().get()[0].addEventListener(eventName, fn);
   };
   bulo.DockWindow = dockWindow;
 })(jQuery,bulo);
