@@ -2,37 +2,29 @@
 <html>
   <head>
     <meta charset=utf-8 />
-    <title>FDW.js</title>
+    <title>fdw.js</title>
+
+    <!-- These two are not normally required by the library, just testing for embedding 3rd party widgets into the layout -->
+    <script src="http://www.bvnet.net/3rdparty/webix/codebase/webix_debug.js"></script>
+    <link href="http://www.bvnet.net/3rdparty/webix/codebase/skins/debug/air.css" rel="stylesheet" type="text/css" />
+
+    <!-- jQuery is required (at least for now ;-) ) -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+
+    <!-- fdw.css - required for managing the look -->
     <link href="fdw.css" rel="stylesheet" type="text/css" />
 
-
-<style type="text/css">
-  div.one{
-    position : absolute;
-    border:2px dashed #000;
-    background-color:white;
-    top : 100px;
-    left : 100px;
-    height : 150px;
-    width : 150px;
-  }
-</style>
-
-
-
-
-
-
-
-
-
-
-
-
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+    <!-- fdw.js - General layout manager code -->
     <script type="text/javascript" src="fdw.js"></script>
+
+    <!-- dockwindow.js - Panel specific code -->
     <script type="text/javascript" src="dockwindow.js"></script>
+    
+    <!-- test.js - Demo / Testing purpose code -->
+    <script type="text/javascript" src="test.js"></script>
+
   </head>
-   <body>
+  <body>
+    <!-- We don't need anything here, everyting is in the code -->
   </body>
 </html>

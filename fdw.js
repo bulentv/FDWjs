@@ -1,26 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// TEST CODE
-$(document).ready( function () {
-  var mgr = new bulo.WindowMgr();
-  mgr.addWindow({title:"First Panel",left:"100px",top:"100px",width:"300px",height:"200px"});
-  mgr.addWindow({title:"Second Panel",left:"100px",top:"400px",width:"400px",height:"200px"});
-  mgr.addWindow({title:"Third Panel",left:"500px",top:"150px",width:"250px",height:"200px"});
-});
-
 (function($,undefined) {
 
   /// WINDOW MGR
@@ -159,6 +136,7 @@ $(document).ready( function () {
     });
 
     wnd.bringToFront();
+    return wnd;
 
   };
   window.bulo = {};
