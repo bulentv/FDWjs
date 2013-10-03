@@ -98,17 +98,30 @@
 
     btn.on("mouseenter",function(e){
       $(this).addClass("dock-btn-active")
-      options.proxy.css({
+      $(this).attr("active",1);
+
+      options.proxy.show();
+      options.proxy.stop().animate({
+        left:proxy_left,
+        width:proxy_width,
+        top:proxy_top,
+        height:proxy_height
+      },300);
+      /*
+      .css({
         left:proxy_left+"px",
         width:proxy_width+"px",
         top:proxy_top+"px",
         height:proxy_height+"px"
       });
+
       options.proxy.fadeIn(200);
+      */
     });
 
     btn.on("mouseleave",function(e){
       $(this).removeClass("dock-btn-active")
+      $(this).attr("active",0);
     });
 
     btn.on("mouseup",function(e){
@@ -148,8 +161,15 @@
 
   }
 
-  Proxy.prototype.test = function(){
-    console.log("Proxy test");
+  Proxy.prototype.getActiveBtn = function(){
+    var activeBtn = null;
+    for(var i in this._buttons) {
+      var btn = this._buttons[i];
+      if(parseInt(btn.btn.attr("active")) == 1) {
+        return this._buttons[i];
+      }
+    }
+    return null;
   };
 
   Proxy.prototype.show = function(){
@@ -179,7 +199,8 @@
           proxy: this._element
         };
         this._buttons.push({
-          btn:CreateDockBtn(options)
+          btn:CreateDockBtn(options),
+          type:btnsToCreate[i]
         });
       }
     }
