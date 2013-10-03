@@ -3,6 +3,7 @@
     var self = this;
 
     this._parent = options.parent;
+    this._taken = false;
     self._zindex = -1;
 
 
@@ -13,7 +14,7 @@
     self.moving = false;
 
     var title = options.title || "Window";
-    var header = $("<div><div class=\"title\">"+title+"</div></div>")
+    var header = self._header = $("<div><div class=\"title\">"+title+"</div></div>")
     .addClass("header");
 
     header.on("mouseenter", function(e) {
@@ -94,6 +95,15 @@
       // Detect the mouse position and apply the coordinated to the
       // window which is being dragged
       function moveHandler(e) {
+        
+        if(self._taken) {
+          
+          self._wnd.addClass("wnd").css({"position":"absolute",width:self._wnd.outerWidth()+"px",height:self._wnd.outerHeight()+"px"});
+          self._header.css({"position":"absolute"});
+          
+          self._parent.takeMe(self);
+          self._taken = false;
+        }
 
         if (!e) e = window.event;  // IE Event Model
 
@@ -136,15 +146,63 @@
         // Unregister the capturing event handlers.
         document.removeEventListener("mouseup", upHandler, true);
         document.removeEventListener("mousemove", moveHandler, true);
+      
+        if(!self._taken) {
+          var engaged = self._parent.getEngaged();
+          if(engaged) {
+            if(engaged.insertThis(self)) {
+              self._parent.removeMe(self);
+              self._taken = true;
+              self.$().css({"cursor":"default"});
 
+            }else{
+              console.log("rejected");
+            }
+
+          }
+        }
         self._triggerEvent(new CustomEvent("aftermove"));
 
       }
     });
   }
 
+  dockWindow.prototype.insertThis = function(wnd) {
+
+    console.log("checking active btn");
+    if(this._proxy) {
+      var activeBtn = this._proxy.getActiveBtn();
+      this._proxy.remove();
+      this._proxy = null;
+      if(activeBtn) {
+        switch(activeBtn.type) {
+          case bulo.dockBtnType.CENTER:
+            console.log("CENTER");break;
+          case bulo.dockBtnType.RIGHT:
+            console.log("inserting : ",wnd);
+            $(".content",this._wnd).css({"width":"50%","float":"left"});
+            wnd._wnd.removeClass("wnd").css({"position":"static",width:"50%",height:"100%",float:"left"});
+            $(".header",wnd._wnd).css({"position":"static"});
+            this._wnd.append(wnd._wnd);
+            console.log("RIGHT");
+            return true;
+          case bulo.dockBtnType.LEFT:
+            console.log("LEFT");break;
+          case bulo.dockBtnType.TOP:
+            console.log("TOP");break;
+          case bulo.dockBtnType.BOTTOM:
+            console.log("BOTTOM");break;
+          default:
+            console.log("Unknown Btn");break;
+        }
+      }
+    }
+    return false;
+  };
   dockWindow.prototype.hideProxy = function() {
     if(this._proxy) {
+      console.log("hiding proxy");
+
       this._proxy.remove();
       this._proxy = null;
     }

@@ -19,7 +19,6 @@
     self._sizing = false;
 
 
-
     self._makeUID = function() {
       return uidPrefix+"_"+(++uidCounter);
     };
@@ -45,9 +44,30 @@
 
   }
 
+  windowMgr.prototype.removeMe = function(wnd){
+    console.log("removeMe:",wnd);
+    for(var i in this._windowObjs) {
+      var o = this._windowObjs[i];
+      if(o.isTheSame(wnd)) {
+        this._windowObjs.splice(i,1);
+        delete this._windowIds[o.$().attr("id")];
+        return;
+      }
+    }
+  };
+  windowMgr.prototype.takeMe = function(wnd){
+    console.log("takeMe:",wnd);
+    this._windowObjs.push(wnd);
+    this._windowIds[wnd.$().attr("id")] = wnd;
+    this._viewport.append(wnd.$());
+  };
   windowMgr.prototype.incrZIndex = function(){
     return ++this._zindex;
-  }
+  };
+
+  windowMgr.prototype.getEngaged = function(){
+    return this._last_wnd;
+  };
 
   windowMgr.prototype.addWindow = function (options){
     var self = this;
@@ -123,6 +143,7 @@
       if(self._last_wnd && !self._last_wnd.isTheSame(cur_wnd)){
         self._last_wnd.$().removeClass("fh");
         self._last_wnd.hideProxy();
+        self._last_wnd = null;
       }
 
       // if actually selected a valid target
@@ -141,6 +162,7 @@
         var wnd = self._windowObjs[i];
         wnd.$().removeClass("fh");
         wnd.hideProxy();
+        self._last_wnd = null;
       }
     });
 
