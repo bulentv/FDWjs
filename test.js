@@ -20,13 +20,15 @@ var small_film_set = [
   { id:18, title:"12 Angry Men", year:1957, votes:164558, rating:8.9, rank:6, category:"Western"}
 ];
 
-function createDT(id) {
+function createDT(id,cb) {
   webix.ready(function(){
-    grid = new webix.ui({
+    cb( new webix.ui({
       container:id,
       view:"datatable",
       drag:true,
       navigation:true,
+      dragColumn:true,
+      resizeColumn:true,
       columns:[
         { id:"rank",  header:"", css:"rank", width:50, sort:"int"},
         { id:"title", header:"Film title", fillspace:true, width:200,  sort:"string"},
@@ -35,7 +37,7 @@ function createDT(id) {
       ],
       select: "row",
       data:small_film_set
-    });     
+    }));
   });     
 }
 
@@ -46,26 +48,36 @@ $(document).ready( function () {
 
   // Add the first panel, we will then add a third party grid inside  
   var panel = mgr.addWindow({
-    title:"First Panel",
-    left:"1150px",
-    top:"225px",
-    width:"500px",
-    height:"300px"
+    title:"Panel with a grid",
+    left:"50px",
+    top:"125px",
+    width:"800px",
+    height:"500px"
   });
 
   var id = panel.$().attr("id");
-  $("<div style='width:100%;height:100%;' id='test_div'></div>").appendTo($("#"+id));
+  $("<div class='content' id='test_div1'></div>").appendTo($("#"+id));
 
   // Create the grid
-  createDT("test_div");
-
-  panel.on("resize", function(e) {
-    window.grid.resize();
+  createDT("test_div1",function(grid) {
+    panel.on("resize", function(e) {
+      grid.resize();
+    });
   });
 
+
   // Add two more panels
-  mgr.addWindow({title:"Second Panel",left:"100px",top:"500px",width:"400px",height:"200px"});
-  mgr.addWindow({title:"Third Panel",left:"800px",top:"150px",width:"250px",height:"200px"});
+  var panel2 = mgr.addWindow({title:"Another panel with a grid",left:"200px",top:"300px",width:"800px",height:"600px"});
+  id = panel2.$().attr("id");
+  $("<div class='content' id='test_div2'></div>").appendTo($("#"+id));
+  // Create the grid
+  createDT("test_div2",function(grid) {
+    panel2.on("resize", function(e) {
+      grid.resize();
+    });
+  });
+
+  mgr.addWindow({title:"Empty Panel",left:"600px",top:"50px",width:"550px",height:"400px"});
 
 });
 

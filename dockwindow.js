@@ -46,6 +46,7 @@
     });
 
     header.css({top:"0px"});
+    this._proxy = null;
 
     this._triggerEvent = function(event){
       this.$().get()[0].dispatchEvent(event);
@@ -69,6 +70,7 @@
 
       self.$().fadeTo(60,0.7);
       self.$().addClass("hilight_frame");
+
 
 
       var offset = wnd.offset(),
@@ -141,6 +143,20 @@
     });
   }
 
+  dockWindow.prototype.hideProxy = function() {
+    if(this._proxy) {
+      this._proxy.remove();
+      this._proxy = null;
+    }
+  };
+  dockWindow.prototype.showProxy = function() {
+    var proxy = this._proxy;
+    if(!proxy) {
+      proxy = this._proxy = new bulo.Proxy({parent:this});
+    }
+
+    proxy.show();
+  };
   dockWindow.prototype.resizeState = function(state) {
     if(!state) {
       return this._resizeState;
@@ -206,31 +222,40 @@
 
       var pos = $e.position(),
       width = $e.width(),
-      height = $e.height();
+      height = $e.height(),
+      padT = parseInt($e.css("padding-top")),
+      padL = parseInt($e.css("padding-left")),
+      padB = parseInt($e.css("padding-bottom")),
+      padR = parseInt($e.css("padding-right"));
+      borderT = parseInt($e.css("border-top")),
+      borderL = parseInt($e.css("border-left")),
+      borderB = parseInt($e.css("border-bottom")),
+      borderR = parseInt($e.css("border-right"));
+
       if(cursor.indexOf('e')!=-1)
       {
-        $e.css({"width":e.clientX-pos.left+"px"});
+        $e.css({"width":e.clientX-(pos.left+padL+padR+borderL+borderR)+"px"}); //ok
       }
       if(cursor.indexOf('s')!=-1)
       {
-        $e.css({"height":e.clientY-pos.top+"px"});
+        $e.css({"height":e.clientY-(pos.top+padT+padB+borderT+borderB)+"px"}); //ok
       }
       if(cursor.indexOf('w')!=-1)
       {
-        if(e.clientX<=pos.left+width) {
+        if(e.clientX<=pos.left+padL+padR+width) {
           $e.css({"left":e.clientX+"px"});
-          $e.css({"width":Math.max((width+pos.left-e.clientX),5)+"px"});
+          $e.css({"width":Math.max((width+(pos.left)-e.clientX),5)+"px"});
         }
       }
       if(cursor.indexOf('n')!=-1)
       {
         if(e.clientY<=pos.top+height) {
           $e.css({"top":e.clientY+"px"});
-          $e.css({"height":Math.max((height+pos.top-e.clientY),5)+"px"});
+          $e.css({"height":Math.max((height+(pos.top)-e.clientY),5)+"px"});
         }
       }
 
-      this._triggerEvent(new CustomEvent("resize"));
+      this._triggerEvent(new CustomEvent("resize",{detail:{height:$e.height()}}));
 
     }
     else {
