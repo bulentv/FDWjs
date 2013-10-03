@@ -87,9 +87,13 @@
         // get the props of the current one
         var _wnd = self._windowObjs[i],
             _id = _wnd.$().attr("id"),
-            _height = _wnd.$().height(),
-            _width = _wnd.$().width(),
-            _pos = _wnd.$().position();
+            _height = _wnd.$().outerHeight(),
+            _width = _wnd.$().outerWidth(),
+            _pos = _wnd.$().position(),
+            padT = parseInt(_wnd.$().css("padding-top")),
+            padL = parseInt(_wnd.$().css("padding-left")),
+            padB = parseInt(_wnd.$().css("padding-bottom")),
+            padR = parseInt(_wnd.$().css("padding-right"));
 
         if(
             // it is not myself
@@ -116,14 +120,18 @@
   
       // if we previously highlighted a different target,
       // activate it
-      if(self._last_wnd && !self._last_wnd.isTheSame(cur_wnd))
+      if(self._last_wnd && !self._last_wnd.isTheSame(cur_wnd)){
         self._last_wnd.$().removeClass("fh");
+        self._last_wnd.hideProxy();
+      }
 
       // if actually selected a valid target
       // activate it
       if(cur_wnd){
         cur_wnd.$().addClass("fh");
         self._last_wnd = cur_wnd;
+        cur_wnd.showProxy();
+        
       }
 
     });
@@ -132,6 +140,7 @@
       for(var i in self._windowObjs){
         var wnd = self._windowObjs[i];
         wnd.$().removeClass("fh");
+        wnd.hideProxy();
       }
     });
 
