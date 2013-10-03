@@ -149,10 +149,10 @@
       this._proxy = null;
     }
   };
-  dockWindow.prototype.showProxy = function() {
+  dockWindow.prototype.showProxy = function(wnd) {
     var proxy = this._proxy;
     if(!proxy) {
-      proxy = this._proxy = new bulo.Proxy({parent:this});
+      proxy = this._proxy = new bulo.Proxy({parent:this,moving:wnd});
     }
 
     proxy.show();

@@ -130,7 +130,7 @@
       if(cur_wnd){
         cur_wnd.$().addClass("fh");
         self._last_wnd = cur_wnd;
-        cur_wnd.showProxy();
+        cur_wnd.showProxy(wnd);
         
       }
 
