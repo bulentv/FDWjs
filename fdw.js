@@ -86,12 +86,12 @@
     wnd.on("mousedown", function(e) {
         wnd.activateResize(e);   
       // We've handled this event. Don't let anybody else see it.  
-      if (e.stopPropagation) e.stopPropagation();  // DOM Level 2
-      else e.cancelBubble = true;                      // IE
+//      if (e.stopPropagation) e.stopPropagation();  // DOM Level 2
+//      else e.cancelBubble = true;                      // IE
 
       // Now prevent any default action.
-      if (e.preventDefault) e.preventDefault();   // DOM Level 2
-      else e.returnValue = false;                     // IE
+//      if (e.preventDefault) e.preventDefault();   // DOM Level 2
+//      else e.returnValue = false;                     // IE
     });
     wnd.on("move",function(ev){
 
