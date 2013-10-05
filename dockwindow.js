@@ -10,6 +10,7 @@
     self.isDragActivated = false;
     self.cursorType = "";
     self.isCursorOnBorder = false;
+    self._parentPane = null;
 
     self.moving = false;
 
@@ -49,8 +50,14 @@
     header.css({top:"0px"});
     this._proxy = null;
 
+
+
     this._triggerEvent = function(event){
       this.$().get()[0].dispatchEvent(event);
+    };
+
+    this._triggerResizeEvent = function() {
+      self._triggerEvent(new CustomEvent("resize"));
     };
 
     this._triggerMoveEvent = function(detail){
@@ -59,6 +66,7 @@
       });
       this._triggerEvent(event);
     };
+
 
     // Handle clicks on the header (mousedown)
     // We will start moving the window as long as the mouse remain down
@@ -103,6 +111,9 @@
           
           self._parent.takeMe(self);
           self._taken = false;
+          self._triggerResizeEvent();
+          self._parentPane.$().unbind("resize",self._triggerResizeEvent);
+          self._parentPane = null;
         }
 
         if (!e) e = window.event;  // IE Event Model
@@ -154,7 +165,9 @@
               self._parent.removeMe(self);
               self._taken = true;
               self.$().css({"cursor":"default"});
-
+              self._triggerResizeEvent()
+              engaged.$().bind("resize",self._triggerResizeEvent);
+              self._parentPane = engaged;
             }else{
               console.log("rejected");
             }
@@ -166,6 +179,50 @@
       }
     });
   }
+
+
+
+  dockWindow.prototype.addWindow = function(newcontent) {
+
+    // find "splitter"
+    var createSplitterHere = null;
+    var splitter = this._wnd.children("#splitter");
+    if(!splitter.length){
+      var content = this._wnd.children(".content");
+      if(!content.length) {
+        // create "content"
+        content = $("<div class='content' style='width:100%;height:100%;'></div>");
+        content.append(newcontent);
+        // append to the wnd
+        this._wnd.append(content);
+        return;
+      }else {
+        // create splitter
+        splitter = $("<div id='splitter' style='width:100%;height:100%'></div>");
+        // add old content
+        splitter.append(content);
+        // add new content
+        splitter.append(newcontent);
+        // append the splitter to wnd
+        splitter.split({orientation:'vertical'});
+        this._wnd.append(splitter);
+      }
+    }else {
+      var right = splitter.children()[2];
+      // create splitter
+      var new_splitter = $("<div id='splitter' style='width:100%;height:100%'></div>");
+      // add old "right" content
+      new_splitter.append(right);
+      // add new content
+      new_splitter.append(newcontent);
+      // replace "right" with the new splitter
+      new_splitter.split({orientation:'vertical'});
+      splitter.append(new_splitter);
+    }
+  };
+  dockWindow.prototype.addSplitter = function(wnd) {
+
+  };
 
   dockWindow.prototype.insertThis = function(wnd) {
 

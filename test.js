@@ -1,3 +1,45 @@
+$(document).ready(function() {
+    $(document).bind('mousedown selectstart', function(e) {
+        console.log("mouse down handled");
+        return $(e.target).is('input, textarea, select, option');
+    });
+    
+ 
+var mgr = new bulo.WindowMgr();
+
+new BULO.DockContainer({parent:$(".viewport")});
+new BULO.DockContainer({parent:$(".viewport")});
+/*
+  // Add the first panel, we will then add a third party grid inside  
+  var panel = window.pp = mgr.addWindow({
+    title:"Panel with a grid",
+    left:"50px",
+    top:"125px",
+    width:"800px",
+    height:"500px"
+  });
+  var id = panel.$().attr("id");
+  */
+
+
+
+/*
+  // Create the grid
+  createDT("test_div1",function(grid) {
+    window.grid1 = grid;
+    panel.on("resize", function(e) {
+      window.grid1.resize();
+      window.grid2.resize();
+    });
+  });
+*/
+    
+});
+
+
+
+
+    
 
 var small_film_set = [
   { id:1, title:"The Shawshank Redemption", year:1994, votes:678790, rating:9.2, rank:1, category:"Thriller"},
@@ -40,59 +82,3 @@ function createDT(id,cb) {
     }));
   });     
 }
-
-// TEST CODE
-$(document).ready( function () {
-
-  var mgr = new bulo.WindowMgr();
-
-  // Add the first panel, we will then add a third party grid inside  
-  var panel = mgr.addWindow({
-    title:"Panel with a grid",
-    left:"50px",
-    top:"125px",
-    width:"800px",
-    height:"500px"
-  });
-  var id = panel.$().attr("id");
-  //$("<div class='content' id='test_div1'></div>").appendTo($("#"+id));
-  $("<div class='content' style='background-color:red;' id='test_div1'></div>").appendTo($("#"+id));
-/*
-  // Create the grid
-  createDT("test_div1",function(grid) {
-    window.grid1 = grid;
-    panel.on("resize", function(e) {
-      window.grid1.resize();
-      window.grid2.resize();
-    });
-  });
-
-*/
-  // Add two more panels
-  var panel2 = mgr.addWindow({title:"Another panel with a grid",left:"200px",top:"300px",width:"800px",height:"600px"});
-  id = panel2.$().attr("id");
-  //$("<div class='content' id='test_div2'></div>").appendTo($("#"+id));
-  $("<div class='content' style='background-color:green;' id='test_div2'></div>").appendTo($("#"+id));
-/*
-// Create the grid
-  createDT("test_div2",function(grid) {
-    window.grid2 = grid;
-    panel2.on("resize", function(e) {
-      window.grid1.resize();
-      window.grid2.resize();
-    });
-  });
-*/
-  var panel3 = mgr.addWindow({title:"Empty Panel",left:"600px",top:"50px",width:"550px",height:"400px"});
-  
-  id = panel3.$().attr("id");
-  //$("<div class='content' id='test_div3'></div>").appendTo($("#"+id));
-  $("<div class='content' style='background-color:blue;' id='test_div3'></div>").appendTo($("#"+id));
-  /*
-  panel3.on("resize", function(e) {
-    window.grid1.resize();
-    window.grid2.resize();
-  });
-*/
-});
-

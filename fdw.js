@@ -83,6 +83,7 @@
     self._windowObjs.push(wnd);
 
     self._viewport.append(wnd.$());
+    wnd.addSplitter();
     wnd.on("mousedown", function(e) {
         wnd.activateResize(e);   
       // We've handled this event. Don't let anybody else see it.  
