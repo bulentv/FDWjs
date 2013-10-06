@@ -6,42 +6,6 @@ html, body {
   overflow:hidden;
 }
 
-.splitter-root {
-  width:100%;
-  height:100%;
-  font-family:Tahoma;
-  color:rgba(200,200,200,0.8);
-  overflow:hidden;
-  position:relative;
-}
-
-.testobj {
-  position:absolute;
-  width:200px;
-  height:100px;
-  left:100px;
-  top:100px;
-  background-color:rgba(120,120,120,0.1);
-  -webkit-transition:background 0.6s 0.5s ease;
-  -moz-transition:background 0.6s 0.5s ease;
-  -o-transition:background 0.6s 0.5s ease;
-  transition:background 0.6s 0.5s ease;
-  /*
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -khtml-border-radius: 5px;
-  border-radius: 5px;
-  */
-}
-
-.testobj:hover {
-  -webkit-transition:background 0.3s;
-  -moz-transition:background 0.3s;
-  -o-transition:background 0.3s;
-  transition:background 0.3s;
-  background-color:rgba(120,120,120,0.7);
-}
-
 *{
   -moz-box-sizing: border-box; 
   -webkit-box-sizing: border-box; 
@@ -56,31 +20,66 @@ html, body {
   user-select: none;
 }
 
+
+.splitter-root {
+  width:100%;
+  height:100%;
+  font-family:Tahoma;
+  color:rgba(200,200,200,0.8);
+  overflow:hidden;
+  position:relative;
+}
+
+.splitter-handle {
+  position:absolute;
+  width:200px;
+  height:100%;
+  right:0px;
+  top:0px;
+  background-color:rgba(120,120,120,0.1);
+  -webkit-transition:background 0.6s 0.5s ease;
+  -moz-transition:background 0.6s 0.5s ease;
+  -o-transition:background 0.6s 0.5s ease;
+  transition:background 0.6s 0.5s ease;
+}
+
+.splitter-handle:hover {
+  -webkit-transition:background 0.3s;
+  -moz-transition:background 0.3s;
+  -o-transition:background 0.3s;
+  transition:background 0.3s;
+  background-color:rgba(120,120,120,0.7);
+}
+/*
 .sample-content {
   width:100%;
   height:100%;
   padding:0px;
 }
+*/
 
-
-
-
-
-.splitWindowRed{
+.dummyRed{
   width:100%;
   height:100%;
-  padding:0px;
+  background-color:red;
 }
-.splitWindowGreen{
+.dummyGreen{
   width:100%;
   height:100%;
-  padding:0px;
+  background-color:green;
 }
-.splitWindowBlue{
+.dummyBlue{
   width:100%;
   height:100%;
-  padding:0px;
+  background-color:blue;
 }
+
+.dummyOrange{
+  width:100%;
+  height:100%;
+  background-color:#ff4;
+}
+
 
 
 
@@ -119,12 +118,6 @@ html, body {
   -moz-transition:background 0.3s;
   -o-transition:background 0.3s;
   transition:background 0.3s;
-  /*
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -khtml-border-radius: 5px;
-  border-radius: 5px;
-  */
 }
 
 .header:hover {

@@ -9,25 +9,57 @@
   BULO.Splitter.prototype = {
     _init: function(options) {
       this._e = $("<div class='splitter-root'></div>");
-      $(".viewport").append(this._e);
+      this._parent = options.parent;
+
+      this._parent.$().append(this._e);
+
+      // get notifed when parent resizes 
+      this._parent.bind("resize", this, this._onParentResize);
 
       this._children = [];
+      this._oldParentSize= 0;
+
     },
 
-    get: function() {
+
+    // returns main jQuery object this object build on top of
+    $: function() {
       return this._e;
     },
 
+    _onParentResize: function(e) {
+
+      var self = e.data;
+      var newParentSize = self._e.width();
+
+      if(self._oldParentSize <= 0) {
+        self._oldParentSize = newParentSize;
+        return;
+      }
+
+      var multiplier = newParentSize / self._oldParentSize;
+
+      self._oldParentSize = newParentSize;
+
+      for(var i in self._children) {
+        var s = self._children[i];
+        if(s.type == "splitter") {
+          s.data.setLeft(s.data.getLeft() * multiplier);
+          s.data.triggerMove();
+        }
+      }
+
+    },
 
     _createSplitter: function() {
-      
+
       return new BULO.Movable({
         base: this._e,
         width:"6px",
         height:"100%",
-        left:"0px",
+        right:"0px",
         top:"0px",
-        class:"testobj",
+        class:"splitter-handle",
         cursor: "e-resize"
       });
 
@@ -41,15 +73,15 @@
 
 
       var self = e.data.self,
-          splitter = e.data.splitter,
+      splitter = e.data.splitter,
 
-          items_before = [],
-          items_after = [],
-          ratio,
+      items_before = [],
+      items_after = [],
+      ratio,
 
-          total_width = self._e.width(),
+      total_width = self._e.width(),
 
-          sfound = false;
+      sfound = false;
 
       var left_content, right_content, last_s;
       for(var i in self._children) {
@@ -94,12 +126,12 @@
       }
 
 
-      console.log(total_width,left,e.data.splitter.id());
+      //console.log(total_width,left,e.data.splitter.id());
     },
 
     makeRoom: function() {
       this.first= false;
-      
+
       var contents = 0;
       for(var i in this._children) {
         var c = this._children[i];
@@ -107,9 +139,9 @@
           contents++;
         }
       }
-      
+
       var total_width = this._e.width();
-      
+
       for(var i in this._children) {
         var s = this._children[i];
         if(s.type == "splitter") {
@@ -120,68 +152,32 @@
 
     },
 
-    oldParentSize: 0,
-
-    onParentResize: function() {
-      var newParentSize = this._e.width();
-      if(this.oldParentSize <= 0) {
-        this.oldParentSize=newParentSize;
-        return;
-      }
-      var multiplier = newParentSize / this.oldParentSize;
-      this.oldParentSize = newParentSize;
-      
-      for(var i in this._children) {
-        var s = this._children[i];
-        if(s.type == "splitter") {
-          s.data.setLeft(s.data.getLeft() * multiplier);
-          s.data.triggerMove();
-        }
-      }
-    },
-
-    tile: function() {
-      var parentSize = this._e.width();
-      
-      var contents = 0;
-      for(var i in this._children) {
-        var c = this._children[i];
-        if(c.type == "content") {
-          contents++;
-        }
-      }
-
-      var each = parentSize / contents;
-     var num = 1; 
-      for(var i in this._children) {
-        var s = this._children[i];
-        if(s.type == "splitter") {
-          s.data.setLeft(each*num);
-          num++;
-          s.data.triggerMove();
-        }
-      }
-
-    },
 
     addContent: function(content) {
-      
+
+
       var splitter = null;
-      
+
       if(this._children.length && this._children[this._children.length-1].type != "splitter") {
         var splitter = this._createSplitter();
-        splitter.bind("omove", {self:this,splitter:splitter}, this._handleSplitterMove);
+        splitter.bind("move", {self:this,splitter:splitter}, this._handleSplitterMove);
 
-        this._e.append(splitter.get());
+        this._e.append(splitter.$());
         this._children.push({
           type:"splitter",
           data:splitter
         });
       }
 
+      this.makeRoom();
+      this._children.push({
+        type:"content",
+        data:content
+      });
       content.css({
         float:"left",
-        width:"100px",
+        width:"100%",
+        height:"100%",
         overflow:"hidden",
         padding:"10px",
         border:"1px solid #555"
@@ -189,19 +185,9 @@
 
       this._e.append(content);
 
-      this._children.push({
-        type:"content",
-        data:content
-      });
-      setTimeout( function () {
       if(splitter)
         splitter.triggerMove();
-      },1);
-      
-      var self = this;
-      setTimeout( function (){
-        self.tile();
-      },100);
+
     }
   };
 })();

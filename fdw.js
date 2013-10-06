@@ -12,6 +12,10 @@
       return Math.round(Math.random()*1000000);
     },
 
+    viewport: function() {
+      return this._viewport;
+    },
+
     _createViewport: function(id){
       return $("<div />")
       .addClass("viewport")
@@ -19,16 +23,17 @@
       .appendTo( $("body") );
     },
 
+    _makeUID: function() {
+        return this._uidPrefix+"_"+(++this._uidCounter);
+      },
+
     _init: function(options){
-      var self = this,
-      uidPrefix = "bulownd",
-      uidCounter = 10000;
+      var self = this;
+      this._uidPrefix = "BULO";
+      this._uidCounter = 10000;
       self._sizing = false;
 
 
-      self._makeUID = function() {
-        return uidPrefix+"_"+(++uidCounter);
-      };
 
       self._last_wnd = null;
       self._zindex = 4000;
@@ -36,6 +41,9 @@
       self._windowObjs = [];
 
       self._viewport = self._createViewport(self._makeUID());
+      
+      
+      /*
       self._viewport.bind("mousemove", function(e) {
         for(var i in self._windowObjs) {
           var wnd = self._windowObjs[i];
@@ -48,6 +56,7 @@
           wnd.deActivateResize(e);
         }
       });
+      */
 
     },
 
@@ -78,6 +87,12 @@
       return this._last_wnd;
     },
 
+    _onWndActivate: function(e) {
+      var wnd = e.data.wnd;
+      var self = e.data.self;
+      wnd.setZIndex(self.incrZIndex());
+    },
+
     addWindow: function (options){
       var self = this;
 
@@ -86,15 +101,29 @@
       options.id = options.id || self._makeUID();
 
       options.parent = self;
-      var wnd = new bulo.DockWindow(options);
+      //var wnd = new bulo.DockWindow(options);
+      var wnd = new BULO.DockContainer(options);
 
       self._windowIds[options.id] = wnd;
       self._windowObjs.push(wnd);
 
       self._viewport.append(wnd.$());
-      wnd.addSplitter();
-      wnd.on("mousedown", function(e) {
-        wnd.activateResize(e);   
+      
+      wnd.addContent($("<div>PANEL 2</div>"));//.addClass("dummyOrange"));
+      wnd.addContent($("<div>PANEL 2</div>"));//.addClass("dummyGreen"));
+
+      wnd.$().css({
+        width: options.width+"px",
+        height: options.height+"px",
+        left: options.left+"px",
+        top: options.top+"px"
+      });
+
+      wnd.bind("activate",{wnd:wnd,self:self},self._onWndActivate);
+      
+      //wnd.addSplitter();
+      //wnd.on("mousedown", function(e) {
+      //  wnd.activateResize(e);   
         // We've handled this event. Don't let anybody else see it.  
         //      if (e.stopPropagation) e.stopPropagation();  // DOM Level 2
         //      else e.cancelBubble = true;                      // IE
@@ -102,12 +131,13 @@
         // Now prevent any default action.
         //      if (e.preventDefault) e.preventDefault();   // DOM Level 2
         //      else e.returnValue = false;                     // IE
-      });
-      wnd.on("move",function(ev){
+      //});
+      
+      wnd.bind("move",{self:this,wnd:wnd},function(ev,org_event){
 
-        var mouseX = ev.detail.mouseX,
-        mouseY = ev.detail.mouseY,
-        id = $(ev.target).attr("id"),
+        var mouseX = org_event.clientX,
+        mouseY = org_event.clientY,
+        id = ev.data.wnd.id(),
         cur_wnd = null;
 
 
@@ -166,8 +196,8 @@
         }
 
       });
-
-      wnd.on("aftermove",function() {
+/*
+      _del_wnd.bind("aftermove",this,function() {
         for(var i in self._windowObjs){
           var wnd = self._windowObjs[i];
           wnd.$().removeClass("fh");
@@ -176,7 +206,8 @@
         }
       });
 
-      wnd.bringToFront();
+      _del_wnd.setZIndex(self.incrZIndex());
+*/
       return wnd;
 
     }

@@ -38,20 +38,17 @@
       return this._id;
     },
 
-    get: function() {
+    // returns main jQuery object this object build on top of
+    $: function() {
       return this._e;
     },
-  
-    bind: function(eventName, data, handler){
-      this._e.bind(eventName, data, handler);
-    },
-
-    on: function(eventName, fn) {
-      this._e.bind(eventName, fn);
+    
+    bind: function(){
+      this._e.bind.apply(this._e, arguments);
     },
 
     triggerMove: function() {
-      this._e.trigger("omove",[this._e.position().left,this._e.position().top, this]);
+      this._e.trigger("move",[this._e.position().left,this._e.position().top, this]);
     },
 
     setLeft: function(left) {
@@ -104,7 +101,7 @@
         top: calcTop+"px"
       });
 
-      self._e.trigger("omove",[calcLeft,calcTop, self]);
+      self._e.trigger("move",[calcLeft,calcTop, self]);
     }
 
   };

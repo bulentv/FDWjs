@@ -12,8 +12,9 @@
       var self = this;
 
       options = options || {};
+      this._id = options.id;
 
-      this._pane = $("<div></div>").addClass("pane")
+      this._e = $("<div></div>").addClass("pane")
       .css({
         width: options.width || "100px",
         height: options.height || "100px",
@@ -23,10 +24,12 @@
       this._header = $("<div><div unselectable='on' class='title unselectable'>HEADER</div></div>").addClass("header");
 
 
-      this._parentContainer = options.parent || $("body")
+      this._parentContainer = options.parent.viewport() || $("body")
 
-      this._parentContainer.append(this._pane);
-      this._pane.append(this._header);
+      this._parentContainer.append(this._e);
+      this._e.append(this._header);
+
+      this._createSplitter();
 
       this._state = "";
       this._resizing = false;
@@ -44,53 +47,73 @@
 
       this._header.bind("mouseenter", this, this._mouseOnHeaderHandler);
       this._header.bind("dblclick", this, this._headerDblClickHandler);
-      this._pane.bind("mouseenter", this, this._mouseOnPaneHandler);
+      this._e.bind("mouseenter", this, this._mouseOnPaneHandler);
+      this._e.bind("mousedown", this, this._mouseDownGeneral);
 
       $(document).bind("mousemove", self, self._moveHandler);
 
     },
 
-    addContent: function(c){
-
-
-      var splitter = new BULO.Splitter();
-      splitter.addContent($("<div>PANEL 1</div>").addClass("splitWindowRed"));
-      splitter.addContent($("<div>PANEL 2</div>").addClass("splitWindowBlue"));
-      splitter.addContent($("<div>PANEL 3</div>").addClass("splitWindowGreen"));
-
-      this._pane.bind("dc_resize", function(e) {
-        splitter.onParentResize();
+    setZIndex: function(zindex) {
+      this._e.css({
+        "z-index": zindex
       });
-
-      this._pane.append(splitter.get());
     },
 
-    on: function(eventName, handler) {
-      this._pane.on(eventName, handler);
+    bind: function() {
+      this._e.bind.apply(this._e, arguments);
+    },
+
+    id: function() {
+      return this._id;
+    },
+
+    _createSplitter: function() {
+      this._splitter = new BULO.Splitter({
+        parent: this
+      });
+    },
+
+    // returns main jQuery object this object build on top of
+    $: function() {
+      return this._e;
+    },
+
+    addContent: function(c){
+      this._splitter.addContent(c);
+      //$("<div>PANEL 1</div>").addClass("dummyRed"));
+      //this._splitter.addContent($("<div>PANEL 2</div>").addClass("dummyBlue"));
+      //this._splitter.addContent($("<div>PANEL 3</div>").addClass("dummyGreen"));
+      //this._splitter.addContent($("<div>PANEL 4</div>").addClass("dummyOrange"));
+    },
+
+    _mouseDownGeneral: function(e) {
+      var self = e.data;
+      self._e.trigger("activate");
     },
 
     _mouseOnPaneHandler: function(e) {
       var self = e.data;
       self._underTheMouseCursor = true;
-      self._pane.bind("mouseleave", self, self._mouseLeavePaneHandler);
+      self._e.bind("mouseleave", self, self._mouseLeavePaneHandler);
     },
 
     _mouseLeavePaneHandler: function(e){
       var self = e.data;
-      self._pane.unbind("mouseleave", self._mouseLeavePaneHandler);
+      self._e.unbind("mouseleave", self._mouseLeavePaneHandler);
       self._underTheMouseCursor = false;
     },
 
     _storePosAndSize: function() {
-      this._old_css.left = this._pane.css("left");
-      this._old_css.top = this._pane.css("top");
-      this._old_css.width = this._pane.css("width");
-      this._old_css.height = this._pane.css("height");
+      this._old_css.left = this._e.css("left");
+      this._old_css.top = this._e.css("top");
+      this._old_css.width = this._e.css("width");
+      this._old_css.height = this._e.css("height");
     },
 
     _restorePosAndSize: function() {
       var self = this;
-      this._pane.stop().animate({
+      this._e.stop().animate({
         left:this._old_css.left,
         top:this._old_css.top,
         width:this._old_css.width,
@@ -100,8 +123,8 @@
           self._maximized = false;
         },
         step:function() {
-          self._pane.trigger("dc_resize");
-          self._pane.trigger("dc_move");
+          self._e.trigger("resize");
+          self._e.trigger("move");
         },
         duration:200
       });
@@ -113,7 +136,7 @@
         self._restorePosAndSize();
       }else{
         self._storePosAndSize();
-        self._pane.stop().animate({
+        self._e.stop().animate({
           left:0,
           top:0,
           width:"100%",
@@ -123,8 +146,8 @@
             self._maximized = true;
           },
           step:function() {
-            self._pane.trigger("dc_resize");
-            self._pane.trigger("dc_move");
+            self._e.trigger("resize");
+            self._e.trigger("move");
           },
           duration:200
         });
@@ -156,13 +179,13 @@
 
       var state = "";
       if(self._resizing) {
-        self._resize(e.clientX, e.clientY);
+        self._resize(e);
 
         e.preventDefault();
         return false;
 
       }else if(self._moving) {
-        self._move(e.clientX, e.clientY);
+        self._move(e);
 
         //console.log("moving");
         e.preventDefault();
@@ -171,12 +194,12 @@
 
       }else if(self._underTheMouseCursor ) {
 
-        var pos = self._pane.offset(),
+        var pos = self._e.offset(),
 
         left = pos.left,
         top = pos.top,
-        right = pos.left + self._pane.outerWidth(),
-        bottom = pos.top + self._pane.outerHeight(),
+        right = pos.left + self._e.outerWidth(),
+        bottom = pos.top + self._e.outerHeight(),
 
         innerLead = 5,
         cornerLead = 15;
@@ -239,10 +262,10 @@
       self._startX = e.clientX;
       self._startY = e.clientY;
 
-      self._startW = self._pane.outerWidth();
-      self._startH = self._pane.outerHeight();
+      self._startW = self._e.outerWidth();
+      self._startH = self._e.outerHeight();
 
-      var pos = self._pane.position();
+      var pos = self._e.position();
 
       self._startL = pos.left;
       self._startT = pos.top;
@@ -253,8 +276,11 @@
 
     },
 
-    _move: function(clientX, clientY) {
+    _move: function(e) {
       var self = this;
+
+      var clientX = e.clientX,
+      clientY = e.clientY;
 
       var parentOffset = self._parentContainer.offset();
       var offsetL = parentOffset.left;
@@ -271,10 +297,13 @@
         top = clientY - (self._startY - self._startT) + "px";
       }
 
-      this.Move(left, top);
+      this.Move(left, top, null, null, e);
     },
 
-    _resize: function( clientX, clientY) {
+    _resize: function( e) {
+
+      var clientX = e.clientX,
+      clientY = e.clientY;
 
       // RESIZE ////////
       var min_size = 50,
@@ -321,11 +350,11 @@
         top = this._startT + Math.min(deltaY,this._startH-min_size);
         height = this._startH - Math.min(deltaY,this._startH-min_size);
       }
-      this.Move(left, top, width, height);
+      this.Move(left, top, width, height, e);
 
     },
 
-    Move: function(left, top, width, height) {
+    Move: function(left, top, width, height, org_event) {
       var css = {};
 
       if(left) css.left = left;
@@ -333,15 +362,11 @@
       if(width) css.width = width;
       if(height) css.height = height;
 
-      this._pane.css(css);
+      this._e.css(css);
       if(width || height) {
-        this._pane.trigger("dc_resize");
-        // TODO:fire resize event here
-        console.log("TODO: fire resize event here");
+        this._e.trigger("resize");
       }else {
-        this._pane.trigger("dc_move");
-        //TODO: fire move event here
-        console.log("TODO: fire move event here");
+        this._e.trigger("move",{org_event:org_event});
       }
       this._storePosAndSize();
       this._maximized = false;

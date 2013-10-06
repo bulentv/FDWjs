@@ -6,9 +6,25 @@ $(document).ready(function() {
  
 var mgr = new BULO.WindowManager();
 
+mgr.addWindow({
+  left:100,
+  top:100,
+  width:400,
+  height:300
+});
 
-var pane1 = new BULO.DockContainer({parent:$(".viewport"),width:"600px",height:"500px"});
-pane1.addContent();
+mgr.addWindow({
+  left:625,
+  top:220,
+  width:350,
+  height:200
+});
+
+//var pane1 = new BULO.DockContainer({parent:$(".viewport"),width:"600px",height:"500px"});
+//pane1.addContent();
+
+
+
 //
 /*
 var pane2 = new BULO.DockContainer({parent:$(".viewport"),width:"1200px",height:"800px"});
