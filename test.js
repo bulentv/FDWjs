@@ -1,14 +1,29 @@
 $(document).ready(function() {
     $(document).bind('mousedown selectstart', function(e) {
-        console.log("mouse down handled");
         return $(e.target).is('input, textarea, select, option');
     });
     
  
-var mgr = new bulo.WindowMgr();
+//var mgr = new bulo.WindowMgr();
 
-new BULO.DockContainer({parent:$(".viewport")});
-new BULO.DockContainer({parent:$(".viewport")});
+//new BULO.DockContainer({parent:$(".viewport")});
+//new BULO.DockContainer({parent:$(".viewport")});
+//
+
+var m = new BULO.Movable({
+  base: $("#test"),
+  class: "testobj",
+  width:"10px",
+  height:"100%",
+  left:"0",
+  top:"0",
+  cursor:"e-resize"
+});
+
+m.on("omove", function(e, left, top, sender) {
+  console.log("hohoooyt",left, top, sender);
+});
+
 /*
   // Add the first panel, we will then add a third party grid inside  
   var panel = window.pp = mgr.addWindow({

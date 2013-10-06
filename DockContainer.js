@@ -11,7 +11,7 @@
 
       options = options || {};
 
-      this._pane = $("<div><div class='sample-content'>DENEME</div></div>").addClass("pane rounded-corners");
+      this._pane = $("<div><div class='sample-content'>DENEME<textarea /></div></div>").addClass("pane");
       this._header = $("<div><div unselectable='on' class='title unselectable'>HEADER</div></div>").addClass("header");
 
 
@@ -330,7 +330,7 @@
     }
   };
   
-  window.BULO = {};
+  window.BULO = window.BULO || {};
   window.BULO.DockContainer = DockContainer;
 
 })();
