@@ -54,9 +54,9 @@
 
 
       var splitter = new BULO.Splitter();
-      splitter.addContent($("<div>Onlarla birlikte İstanbul’da bayramdan sonra inşallah start vereceğiz. Sadece ben değil benim dışımda 2 tane daha aday adayımız var. Onlarla omuz omuza CHP’nin İstanbul’da iktidarını sağlamak için mücadele edeceğiz” ifadelerini kullandı. </div>").addClass("splitWindowRed"));
-      splitter.addContent($("<div> iOnlarla birlikte İstanbul’da bayramdan sonra inşallah start vereceğiz. Sadece ben değil benim dışımda 2 tane daha aday adayımız var. Onlarla omuz omuza CHP’nin İstanbul’da iktidarını sağlamak için mücadele edeceğiz” ifadelerini kullandı.</div>").addClass("splitWindowBlue"));
-      splitter.addContent($("<div> iOnlarla birlikte İstanbul’da bayramdan sonra inşallah start vereceğiz. Sadece ben değil benim dışımda 2 tane daha aday adayımız var. Onlarla omuz omuza CHP’nin İstanbul’da iktidarını sağlamak için mücadele edeceğiz” ifadelerini kullandı.</div>").addClass("splitWindowGreen"));
+      splitter.addContent($("<div>PANEL 1</div>").addClass("splitWindowRed"));
+      splitter.addContent($("<div>PANEL 2</div>").addClass("splitWindowBlue"));
+      splitter.addContent($("<div>PANEL 3</div>").addClass("splitWindowGreen"));
 
       this._pane.bind("dc_resize", function(e) {
         splitter.onParentResize();
