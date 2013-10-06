@@ -1,10 +1,12 @@
 (function () {
 
-  var Movable = function(options) {
+  var BULO = window.BULO = window.BULO || {};
+
+  BULO.Movable = function(options) {
     this._init(options);
   }
 
-  Movable.prototype = {
+  BULO.Movable.prototype = {
     _init: function(options) {
       this._e = $("<div></div>")
         .addClass(options.class);
@@ -28,10 +30,37 @@
       this._startL = 0;
       this._startT = 0;
 
+      this._id = Math.random();
+
+    },
+
+    id: function() {
+      return this._id;
+    },
+
+    get: function() {
+      return this._e;
     },
   
+    bind: function(eventName, data, handler){
+      this._e.bind(eventName, data, handler);
+    },
+
     on: function(eventName, fn) {
       this._e.bind(eventName, fn);
+    },
+
+    triggerMove: function() {
+      this._e.trigger("omove",[this._e.position().left,this._e.position().top, this]);
+    },
+
+    setLeft: function(left) {
+      this._e.css({left:left+"px"});
+      this.triggerMove();
+    },
+
+    getLeft: function(){
+      return this._e.position().left;
     },
     
     _upHandler: function(e) {
@@ -79,7 +108,4 @@
     }
 
   };
-
-  window.BULO = window.BULO || {};
-  window.BULO.Movable = Movable;
 })();

@@ -1,17 +1,25 @@
 (function () {
+  
+  var BULO = window.BULO = window.BULO || {};
 
-  var DockContainer = function(options) {
+  BULO.DockContainer = function(options) {
     this._init(options);
   }
 
-  DockContainer.prototype = {
+  BULO.DockContainer.prototype = {
 
     _init: function(options) {
       var self = this;
 
       options = options || {};
 
-      this._pane = $("<div><div class='sample-content'>DENEME<textarea /></div></div>").addClass("pane");
+      this._pane = $("<div></div>").addClass("pane")
+      .css({
+        width: options.width || "100px",
+        height: options.height || "100px",
+        top: options.top || "100px",
+        left: options.left || "100px"
+      });
       this._header = $("<div><div unselectable='on' class='title unselectable'>HEADER</div></div>").addClass("header");
 
 
@@ -42,6 +50,25 @@
 
     },
 
+    addContent: function(c){
+
+
+      var splitter = new BULO.Splitter();
+      splitter.addContent($("<div>Onlarla birlikte İstanbul’da bayramdan sonra inşallah start vereceğiz. Sadece ben değil benim dışımda 2 tane daha aday adayımız var. Onlarla omuz omuza CHP’nin İstanbul’da iktidarını sağlamak için mücadele edeceğiz” ifadelerini kullandı. </div>").addClass("splitWindowRed"));
+      splitter.addContent($("<div> iOnlarla birlikte İstanbul’da bayramdan sonra inşallah start vereceğiz. Sadece ben değil benim dışımda 2 tane daha aday adayımız var. Onlarla omuz omuza CHP’nin İstanbul’da iktidarını sağlamak için mücadele edeceğiz” ifadelerini kullandı.</div>").addClass("splitWindowBlue"));
+      splitter.addContent($("<div> iOnlarla birlikte İstanbul’da bayramdan sonra inşallah start vereceğiz. Sadece ben değil benim dışımda 2 tane daha aday adayımız var. Onlarla omuz omuza CHP’nin İstanbul’da iktidarını sağlamak için mücadele edeceğiz” ifadelerini kullandı.</div>").addClass("splitWindowGreen"));
+
+      this._pane.bind("dc_resize", function(e) {
+        splitter.onParentResize();
+      });
+
+      this._pane.append(splitter.get());
+    },
+
+    on: function(eventName, handler) {
+      this._pane.on(eventName, handler);
+    },
+
     _mouseOnPaneHandler: function(e) {
       var self = e.data;
       self._underTheMouseCursor = true;
@@ -62,19 +89,28 @@
     },
 
     _restorePosAndSize: function() {
+      var self = this;
       this._pane.stop().animate({
         left:this._old_css.left,
         top:this._old_css.top,
         width:this._old_css.width,
-        height:this._old_css.height
-      },100);
+        height:this._old_css.height,
+      },{
+        done:function() {
+          self._maximized = false;
+        },
+        step:function() {
+          self._pane.trigger("dc_resize");
+          self._pane.trigger("dc_move");
+        },
+        duration:200
+      });
     },
 
     _headerDblClickHandler: function(e) {
       var self = e.data;
       if(self._maximized) {
         self._restorePosAndSize();
-        self._maximized = false;
       }else{
         self._storePosAndSize();
         self._pane.stop().animate({
@@ -82,8 +118,15 @@
           top:0,
           width:"100%",
           height:"100%"
-        },100,function() {
-          self._maximized = true;
+        },{
+          done:function() {
+            self._maximized = true;
+          },
+          step:function() {
+            self._pane.trigger("dc_resize");
+            self._pane.trigger("dc_move");
+          },
+          duration:200
         });
       }
     },
@@ -292,9 +335,11 @@
 
       this._pane.css(css);
       if(width || height) {
+        this._pane.trigger("dc_resize");
         // TODO:fire resize event here
         console.log("TODO: fire resize event here");
       }else {
+        this._pane.trigger("dc_move");
         //TODO: fire move event here
         console.log("TODO: fire move event here");
       }
@@ -329,9 +374,5 @@
       } 
     }
   };
-  
-  window.BULO = window.BULO || {};
-  window.BULO.DockContainer = DockContainer;
-
 })();
   

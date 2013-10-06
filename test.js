@@ -2,49 +2,23 @@ $(document).ready(function() {
     $(document).bind('mousedown selectstart', function(e) {
         return $(e.target).is('input, textarea, select, option');
     });
-    
+//var BULO = window.BULO || {};    
  
-//var mgr = new bulo.WindowMgr();
+var mgr = new BULO.WindowManager();
 
-//new BULO.DockContainer({parent:$(".viewport")});
-//new BULO.DockContainer({parent:$(".viewport")});
+
+var pane1 = new BULO.DockContainer({parent:$(".viewport"),width:"600px",height:"500px"});
+pane1.addContent();
 //
-
-var m = new BULO.Movable({
-  base: $("#test"),
-  class: "testobj",
-  width:"10px",
-  height:"100%",
-  left:"0",
-  top:"0",
-  cursor:"e-resize"
-});
-
-m.on("omove", function(e, left, top, sender) {
-  console.log("hohoooyt",left, top, sender);
-});
-
 /*
-  // Add the first panel, we will then add a third party grid inside  
-  var panel = window.pp = mgr.addWindow({
-    title:"Panel with a grid",
-    left:"50px",
-    top:"125px",
-    width:"800px",
-    height:"500px"
-  });
-  var id = panel.$().attr("id");
-  */
+var pane2 = new BULO.DockContainer({parent:$(".viewport"),width:"1200px",height:"800px"});
+pane2.addContent($("<div id='test_div1' class=''></div>"));
 
 
-
-/*
   // Create the grid
   createDT("test_div1",function(grid) {
-    window.grid1 = grid;
-    panel.on("resize", function(e) {
-      window.grid1.resize();
-      window.grid2.resize();
+    pane2.on("dc_resize", function(e) {
+      grid.resize();
     });
   });
 */
