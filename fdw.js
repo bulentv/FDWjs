@@ -227,7 +227,6 @@
                   sourceWnd._taken = true;
                 }
               }
-              return true;
             case BULO.dockBtnType.LEFT:
               console.log("LEFT");break;
             case BULO.dockBtnType.TOP:
