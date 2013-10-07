@@ -20,8 +20,8 @@
     },
 
     _makeUID: function() {
-        return this._uidPrefix+"_"+(++this._uidCounter);
-      },
+      return this._uidPrefix+"_"+(++this._uidCounter);
+    },
 
     _init: function(options){
       var self = this;
@@ -37,7 +37,7 @@
       self._windowObjs = [];
 
       self._viewport = self._createViewport(self._makeUID());
-      
+
     },
 
     removeMe: function(wnd){
@@ -90,7 +90,7 @@
       self._viewport.append(wnd.$());
 
       wnd.setZIndex(self.incrZIndex());
-      
+
       wnd.addContent($("<div>PANEL 2</div>"));//.addClass("dummyOrange"));
       wnd.addContent($("<div id='"+options.id+"'></div>"));//.addClass("dummyGreen"));
 
@@ -102,13 +102,13 @@
       });
 
       wnd.bind("activate",{wnd:wnd,self:self},self._onWndActivate);
-      
+
       wnd.bind("move",{self:this,wnd:wnd},function(ev,data){
-        
+
         if(!data) return;
 
         var org_event = data.org_event;
-        
+
         // for now, maximize/normal command is not providibf the org event
         // object so we are ignoring that here 
         //
@@ -170,7 +170,7 @@
         // if actually selected a valid target
         // activate it
         if(cur_wnd){
-          
+
           // clear the z-order fix timer if there is any
           clearTimeout(self._zReOrderFixTimer);
 
@@ -203,22 +203,43 @@
 
       wnd.bind("aftermove",wnd,function(e) {
         //console.log(e,wnd,self._last_wnd,self._last_wnd._proxy.getActiveBtn());
-       
+
         var sourceWnd = e.data;
         var destWnd = self._last_wnd;
+        if(destWnd._proxy) {
+          var activeBtn = destWnd._proxy.getActiveBtn();
+          destWnd._proxy.remove();
+          destWnd._proxy = null;
+          if(activeBtn) {
+            switch(activeBtn.type) {
+            case BULO.dockBtnType.CENTER:
+              console.log("CENTER");break;
+            case BULO.dockBtnType.RIGHT:
+              if(!sourceWnd._taken) {
+                if(destWnd) {
+                  self.removeMe(sourceWnd);
+                  var children = sourceWnd.getChildren();
+                  for(var i in children){
+                    destWnd.addWindow(children[i]);
+                  }
+                  sourceWnd.$().remove();
 
-        if(!sourceWnd._taken) {
-          if(destWnd) {
-            self.removeMe(sourceWnd);
-            var children = sourceWnd.getChildren();
-            for(var i in children){
-              destWnd.addWindow(children[i]);
+                  sourceWnd._taken = true;
+                }
+              }
+              return true;
+            case BULO.dockBtnType.LEFT:
+              console.log("LEFT");break;
+            case BULO.dockBtnType.TOP:
+              console.log("TOP");break;
+            case BULO.dockBtnType.BOTTOM:
+              console.log("BOTTOM");break;
+            default:
+              console.log("Unknown Btn");break;
             }
-            sourceWnd.$().remove();
-
-            sourceWnd._taken = true;
           }
         }
+
 
 
         // look for the current hi-light window
@@ -234,7 +255,7 @@
           wnd.$().removeClass("fh");
 
           wnd.hideProxy();
-          
+
           //reset the active wnd storage
           self._last_wnd = null;
         }
