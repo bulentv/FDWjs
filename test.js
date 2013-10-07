@@ -15,17 +15,17 @@ mgr.addWindow({
 
 mgr.addWindow({
   left:625,
-  top:220,
-  width:350,
-  height:200
+  top:120,
+  width:1150,
+  height:600
 });
 
 var pane3 = 
 mgr.addWindow({
-  left:825,
-  top:520,
-  width:250,
-  height:400,
+  left:225,
+  top:220,
+  width:950,
+  height:500,
   id:"test_div1"
 });
 
