@@ -45,6 +45,8 @@
       this._startL = 0;
       this._startT = 0;
 
+      this._proxy = null;
+
       this._header.bind("mouseenter", this, this._mouseOnHeaderHandler);
       this._header.bind("dblclick", this, this._headerDblClickHandler);
       this._e.bind("mouseenter", this, this._mouseOnPaneHandler);
@@ -54,10 +56,34 @@
 
     },
 
+    hideProxy: function() {
+      if(this._proxy) {
+        console.log("hiding proxy");
+
+        this._proxy.remove();
+        this._proxy = null;
+      }
+    },
+
+    showProxy: function(wnd) {
+      var proxy = this._proxy;
+      if(!proxy) {
+        proxy = this._proxy = new BULO.Proxy({parent:this,moving:wnd});
+      }
+
+      proxy.show();
+    },
+
     setZIndex: function(zindex) {
+
       this._e.css({
         "z-index": zindex
       });
+      this._zindex = zindex;
+    },
+
+    zIndex: function(){
+      return this._zindex;
     },
 
     bind: function() {
@@ -245,6 +271,7 @@
       //console.log("mouse up ending " + self._state);
       self._resizing = false;
       self._moving = false;
+      self._e.trigger("aftermove");
     },
 
     _downHandler: function(e) {

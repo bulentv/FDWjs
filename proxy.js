@@ -1,6 +1,7 @@
-(function() {
+(function () {
 
   var BULO = window.BULO = window.BULO || {};
+
 
   BULO.dockBtnType = {
     CENTER:0,
@@ -134,12 +135,12 @@
 
   }
 
-
-  BULO.Proxy = function(options){
+  BULO.Proxy = function(options) {
     this._init(options);
-  };
+  }
 
   BULO.Proxy.prototype = {
+
     _init: function(options){
       var self = this;
 
@@ -186,12 +187,12 @@
         console.log("Proxy show");
 
         this._visible = true;
-
+/*
         self._to = setTimeout( function () {
           self._parent.bringToFront();    
           self._moving.bringToFront();    
         },1000);
-
+*/
         var btnsToCreate = [
           BULO.dockBtnType.LEFT,
           BULO.dockBtnType.RIGHT,

@@ -20,6 +20,13 @@ mgr.addWindow({
   height:200
 });
 
+mgr.addWindow({
+  left:825,
+  top:520,
+  width:250,
+  height:400
+});
+
 //var pane1 = new BULO.DockContainer({parent:$(".viewport"),width:"600px",height:"500px"});
 //pane1.addContent();
 
