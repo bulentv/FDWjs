@@ -26,6 +26,21 @@
     $: function() {
       return this._e;
     },
+    bind: function() {
+      this._e.bind.apply(this._e, arguments);
+    },
+
+    getChildren: function () {
+      var ret = [];
+      for(var i in this._children) {
+        var c = this._children[i];
+        if(c.type == "content") {
+          ret.push(c.data);
+        }
+      }
+      this.$().remove();
+      return ret;
+    },
 
     _onParentResize: function(e) {
 
@@ -124,7 +139,8 @@
           position: "absolute"
         });
       }
-
+      self.$().trigger("smove");
+      $(document).trigger("dmove");
 
       //console.log(total_width,left,e.data.splitter.id());
     },
@@ -179,7 +195,7 @@
         width:"100%",
         height:"100%",
         overflow:"hidden",
-        padding:"10px",
+//        padding:"10px",
         border:"1px solid #555"
       });
 

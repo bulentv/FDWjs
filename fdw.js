@@ -44,7 +44,7 @@
       console.log("removeMe:",wnd);
       for(var i in this._windowObjs) {
         var o = this._windowObjs[i];
-        if(o.isTheSame(wnd)) {
+        if(o.id() == wnd.id()) {
           this._windowObjs.splice(i,1);
           delete this._windowIds[o.$().attr("id")];
           return;
@@ -92,7 +92,7 @@
       wnd.setZIndex(self.incrZIndex());
       
       wnd.addContent($("<div>PANEL 2</div>"));//.addClass("dummyOrange"));
-      wnd.addContent($("<div>PANEL 2</div>"));//.addClass("dummyGreen"));
+      wnd.addContent($("<div id='"+options.id+"'></div>"));//.addClass("dummyGreen"));
 
       wnd.$().css({
         width: options.width+"px",
@@ -193,9 +193,33 @@
 
         }
 
+        return wnd;
+
       });
 
-      wnd.bind("aftermove",this,function() {
+      wnd.bind("smove", function () {
+        console.log("smove!");
+      });
+
+      wnd.bind("aftermove",wnd,function(e) {
+        //console.log(e,wnd,self._last_wnd,self._last_wnd._proxy.getActiveBtn());
+       
+        var sourceWnd = e.data;
+        var destWnd = self._last_wnd;
+
+        if(!sourceWnd._taken) {
+          if(destWnd) {
+            self.removeMe(sourceWnd);
+            var children = sourceWnd.getChildren();
+            for(var i in children){
+              destWnd.addWindow(children[i]);
+            }
+            sourceWnd.$().remove();
+
+            sourceWnd._taken = true;
+          }
+        }
+
 
         // look for the current hi-light window
         // actually get everything

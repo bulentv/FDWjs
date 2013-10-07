@@ -20,11 +20,20 @@ mgr.addWindow({
   height:200
 });
 
+var pane3 = 
 mgr.addWindow({
   left:825,
   top:520,
   width:250,
-  height:400
+  height:400,
+  id:"test_div1"
+});
+
+// Create the grid
+createDT("test_div1",function(grid) {
+  $(document).bind("dmove", null, function(e) {
+    grid.resize();
+  });
 });
 
 //var pane1 = new BULO.DockContainer({parent:$(".viewport"),width:"600px",height:"500px"});

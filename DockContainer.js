@@ -47,6 +47,8 @@
 
       this._proxy = null;
 
+      this._taken = false;
+
       this._header.bind("mouseenter", this, this._mouseOnHeaderHandler);
       this._header.bind("dblclick", this, this._headerDblClickHandler);
       this._e.bind("mouseenter", this, this._mouseOnPaneHandler);
@@ -54,6 +56,30 @@
 
       $(document).bind("mousemove", self, self._moveHandler);
 
+    },
+
+    isTaken: function() {
+      return this._taken;
+    },
+
+    insertThis: function(source_wnd) {
+      console.log("inserting : ",source_wnd);
+
+      source_wnd.$().css({
+        left:"0px",
+        top:"0px",
+        width:"100%",
+        height:"100%"
+      });
+      this._splitter.addContent(source_wnd.$());
+      
+      //$(".content",this._wnd).css({"width":"50%","float":"left"});
+      
+      //wnd._wnd.removeClass("wnd").css({"position":"static",width:"50%",height:"100%",float:"left"});
+      //$(".header",wnd._wnd).css({"position":"static"});
+      //this._wnd.append(wnd._wnd);
+      //console.log("RIGHT");
+      return true;
     },
 
     hideProxy: function() {
@@ -94,9 +120,24 @@
       return this._id;
     },
 
+    addWindow: function(w) {
+      this._splitter.addContent(w);
+    },
+
+    getChildren: function() {
+      return this._splitter.getChildren();
+    },
+
     _createSplitter: function() {
+      
+      var self = this;
+      
       this._splitter = new BULO.Splitter({
         parent: this
+      });
+      
+      this._splitter.bind("smove",this._splitter, function (e) {
+        self.$().trigger("smove");  
       });
     },
 
@@ -268,10 +309,13 @@
       var self = e.data;
 
       $(document).unbind("mouseup", self._upHandler); 
+      
+      
       //console.log("mouse up ending " + self._state);
       self._resizing = false;
       self._moving = false;
       self._e.trigger("aftermove");
+
     },
 
     _downHandler: function(e) {
