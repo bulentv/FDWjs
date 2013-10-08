@@ -65,15 +65,15 @@
       });
 
       wnd.setParent(this,e);
-      
-      var options = {
-        id: this._makeUID(),
-        title: this._makeUID(),
-        mode: "child"
-      }
+
+      var options = {};
+      options.id = this._makeUID();
+      options.title = this._makeUID();
+      options.mode = "child";
 
       var innerWnd =  this._createDockContainer(options);
       wnd.addWindow(innerWnd);
+      
       this._windowObjs.push(wnd);
       this._windowIds[wnd.$().attr("id")] = wnd;
       this._viewport.append(wnd.$());
@@ -98,17 +98,24 @@
 
     addWindow: function (options){
       var self = this;
+      
+      options.id = self._makeUID();
+      options.title = self._makeUID();
+      options.mode = "normal";
       var wnd = this._createDockContainer(options);
+      
+      options.id = self._makeUID();
+      options.title = self._makeUID();
+      options.mode = "child";
+      options.content = null;
+      var innerWnd =  this._createDockContainer(options);
+
       
       self._windowIds[options.id] = wnd;
       self._windowObjs.push(wnd);
       self._viewport.append(wnd.$());
       wnd.setZIndex(self.incrZIndex());
 
-      options.id = self._makeUID();
-      options.title = self._makeUID();
-      options.mode = "child";
-      var innerWnd =  this._createDockContainer(options);
       wnd.addWindow(innerWnd);
 
       return wnd;
@@ -262,7 +269,7 @@
 
 
 
-                  //wnd.setZIndex(self.incrZIndex());
+                  // DOCKING
                   var children = sourceWnd.getChildren();
                   for(var i in children){
                     var wnd = children[i];

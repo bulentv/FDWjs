@@ -42,6 +42,9 @@
     },
 
     getChildren: function () {
+      if(this._children.length <= 0)
+        return null;
+
       var ret = [];
       for(var i in this._children) {
         var c = this._children[i];
@@ -157,35 +160,40 @@
 
     _fillSpace: function() {
 
+      var last_child = {};
+
       var splitters = [];
-      var oldVals = [];
-      var total_width = this._e.width();
-      
-      var length = this._children.length;
-      if(length<=0) {
-        this.$().remove();
-        return;
+
+      // remove repeated splitters
+      for(var i=0;i<this._children.length;i++) {
+        var child = this._children[i];
+        if(child.type == "splitter"){
+          if(i==0 || last_child.type == "splitter") {
+            this._children.splice(i,1);
+            child.data.$().remove();
+            i--;
+          }else if(i==this._children.length-1){
+            this._children.pop();
+            child.data.$().remove();
+            break;
+          }else{
+            splitters.push(child.data);
+          }
+        }
+        last_child = child;
       }
 
-      var filled_width = this._children[length-1].data.getLeft();
-      var ratio = total_width / filled_width;
-      var s = this._children.pop();
-      s.data.$().remove();
-
-      if(length==2) {
-        this._children[0].data.$().css({
-          width:"100%"
-
+      
+      if(splitters.length == 0) {
+        this.$().children().css({
+          width:"100%",
+          left:"0px"
         });
 
-        return;
-      }
-
-      for(var i in this._children) {
-        var s = this._children[i];
-        if(s.type == "splitter") {
-          s.data.setLeft(s.data.getLeft() * ratio);
-          this._handleSplitterMove({data:{splitter:s.data,self:this}},s.data.getLeft());
+      }else {
+        this._children[0].data.$().css({left:"0px"});
+        for(var i in splitters) {
+          splitters[i].triggerMove();
         }
       }
     },
@@ -231,6 +239,44 @@
 
     },
 
+    addRawContent: function(content){
+      var splitter = null;
+
+      if(this._children.length && this._children[this._children.length-1].type != "splitter") {
+        var splitter = this._createSplitter();
+        splitter.bind("move", {self:this,splitter:splitter}, this._handleSplitterMove);
+
+        this._e.append(splitter.$());
+        this._children.push({
+          type:"splitter",
+          data:splitter
+        });
+      }
+
+      this.makeRoom();
+
+      this._children.push({
+        type:"content",
+        data:content
+      });
+      
+      content.css({
+        float:"left",
+        width:"100%",
+        height:"100%",
+        left:"0px",
+        top:"0px",
+        overflow:"hidden",
+        border:"1px solid #555"
+      });
+
+      this._e.append(content);
+
+      if(splitter)
+        splitter.triggerMove();
+
+    },
+
     addContent: function(wnd) {
 
 
@@ -249,22 +295,16 @@
       }
 
       var content,data;
-      if(!wnd) {
-        content = $("<div />");
-        data = content;
-      }else {
-        content = wnd.$();
-        data = wnd;
-        wnd.setBase(this.$());
-        wnd.bind("undock", {self:this,wnd:wnd}, this.unDockContent);
-      }
+      content = wnd.$();
+      data = wnd;
+      wnd.setBase(this.$());
+      wnd.bind("undock", {self:this,wnd:wnd}, this.unDockContent);
 
       this.makeRoom();
 
       this._children.push({
         type:"content",
-        data:data,
-        empty:wnd?false:true
+        data:wnd,
       });
 /*
       if(this._children.length <= 0) {

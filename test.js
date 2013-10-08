@@ -6,31 +6,18 @@ $(document).ready(function() {
  
 var mgr = new BULO.WindowManager();
 
-mgr.addWindow({
-  left:100,
-  top:100,
-  width:400,
-  height:300,
-  title:"Window 1"
-});
+var panelsToCreate = 5;
+for(var i=0;i<panelsToCreate;i++) {
+  mgr.addWindow({
+    left:300 * (Math.random()*5),
+    top:100 * (Math.random()*8),
+    width:400,
+    height:300,
+    title:"Window " + (i+1),
+    content: $("<div id='_c'>Default Content</div>")
+  });
 
-mgr.addWindow({
-  left:625,
-  top:120,
-  width:1150,
-  height:600,
-  title:"Window 2"
-});
-
-var pane3 = 
-mgr.addWindow({
-  left:225,
-  top:220,
-  width:950,
-  height:500,
-  id:"test_div1",
-  title:"Window 3"
-});
+}
 
 /*
 // Create the grid

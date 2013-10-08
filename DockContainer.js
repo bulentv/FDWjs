@@ -38,7 +38,11 @@
 
       this._e.append(this._header);
 
+      
       this._createSplitter();
+      if(options.content) {
+        this._splitter.$().append($(options.content));
+      }
 
       this._state = "";
       this._resizing = false;
@@ -155,18 +159,33 @@
       this._title.text(title);
     },
 
+    fixTitles: function(new_wnd) {
+      /*
+      var count = this._splitter.itemCount(); 
+      if(count == 1 ||  this._splitter._children[this._splitter._children.length-1].type == "splitter") {
+        this.setTitle(this._splitter._children[0].data.title());
+        this._splitter._children[0].data._header.hide();
+      }else{
+        if(count == 2) {
+          this._splitter._children[0].data._header.show();
+        }
+        this.setTitle("FDW.js") 
+        if(new_wnd)
+          new_wnd._header.show();
+      }
+
+      if(this._old_parent && this._old_parent.fixTitles)
+        this._old_parent.fixTitles();
+      */
+    },
+
     addWindow: function(wnd) {
 
+      wnd._splitter._e.append(this._splitter._e.children("#_c"));
+
       wnd.setParent(this,null);
-      
       this._splitter.addContent(wnd);
-      if(this._splitter.itemCount() == 1) {
-        this.setTitle(wnd.title());
-        wnd._header.hide();
-      }else{
-        this.setTitle("FDW.js") 
-        wnd._header.show();
-      }
+      this.fixTitles(wnd);
     },
 
     getChildren: function() {
@@ -415,6 +434,7 @@
       if(self._mode == "child") {
         self.changeWindowMode("normal");
         self._mgr.takeMe(self,e);
+        self.fixTitles();
         self.$().trigger("undock");
       }else {
         this.Move(left, top, null, null, e);
