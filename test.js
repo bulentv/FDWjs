@@ -10,14 +10,16 @@ mgr.addWindow({
   left:100,
   top:100,
   width:400,
-  height:300
+  height:300,
+  title:"Window 1"
 });
 
 mgr.addWindow({
   left:625,
   top:120,
   width:1150,
-  height:600
+  height:600,
+  title:"Window 2"
 });
 
 var pane3 = 
@@ -26,16 +28,18 @@ mgr.addWindow({
   top:220,
   width:950,
   height:500,
-  id:"test_div1"
+  id:"test_div1",
+  title:"Window 3"
 });
 
+/*
 // Create the grid
 createDT("test_div1",function(grid) {
   $(document).bind("dmove", null, function(e) {
     grid.resize();
   });
 });
-
+*/
 //var pane1 = new BULO.DockContainer({parent:$(".viewport"),width:"600px",height:"500px"});
 //pane1.addContent();
 

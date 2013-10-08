@@ -13,6 +13,11 @@
 
       options = options || {};
       this._id = options.id;
+      this._mode = options.mode || "normal";
+      this._old_parent = null;
+      this._parent = null;
+      this._mgr = options.mgr;
+      this.setParent(options.parent,null);
 
       this._e = $("<div></div>").addClass("pane")
       .css({
@@ -21,12 +26,16 @@
         top: options.top || "100px",
         left: options.left || "100px"
       });
-      this._header = $("<div><div unselectable='on' class='title unselectable'>HEADER</div></div>").addClass("header");
+      this._titletext = options.title || "Untitled";
+      this._title = $("<div unselectable='on'>"+this._titletext+"</div>").addClass("title"); 
+      this._title.attr("unselectable","on");
+      this._header = $("<div></div>").addClass("header");
+      this._header.append(this._title);
+      if(options.mode == "child") {
+        this.changeWindowMode("child");
+      }
 
 
-      this._parentContainer = options.parent.viewport() || $("body")
-
-      this._parentContainer.append(this._e);
       this._e.append(this._header);
 
       this._createSplitter();
@@ -58,28 +67,50 @@
 
     },
 
+    setParent: function(parent,e){
+      this._old_parent = this._parent;
+      this._parent = parent;
+      this._parentContainer = this._parent.$() || $("body")
+
+      if(this._old_parent && e) {
+        this._startL = this._old_parent.$().position().left + this.$().position().left;
+        this._startT = this._old_parent.$().position().top + this.$().position().top+this._header.outerHeight();
+        this._startX = e.clientX;
+        this._startY = e.clientY;
+        this.$().css({
+          left:this._startL,
+          top:this._startT
+        });
+      }
+
+      this._parentContainer.append(this._e);
+    },
+
     isTaken: function() {
       return this._taken;
     },
 
-    insertThis: function(source_wnd) {
-      console.log("inserting : ",source_wnd);
+    title: function() {
+      return this._titletext;
+    },
+    
+    setBase: function(base) {
+      this._base = base;
+    },
 
-      source_wnd.$().css({
-        left:"0px",
-        top:"0px",
-        width:"100%",
-        height:"100%"
-      });
-      this._splitter.addContent(source_wnd.$());
-      
-      //$(".content",this._wnd).css({"width":"50%","float":"left"});
-      
-      //wnd._wnd.removeClass("wnd").css({"position":"static",width:"50%",height:"100%",float:"left"});
-      //$(".header",wnd._wnd).css({"position":"static"});
-      //this._wnd.append(wnd._wnd);
-      //console.log("RIGHT");
-      return true;
+    changeWindowMode: function(mode) {
+      console.log("changing "+this._id+" to "+mode);
+      console.log(this._e,this._title,this._header);
+      if(mode == "normal") {
+        this._e.removeClass("tool-pane");
+        this._title.removeClass("tool-title");
+        this._header.removeClass("tool-header");
+      }else if(mode == "child") {
+        this._e.addClass("tool-pane");
+        this._title.addClass("tool-title");
+        this._header.addClass("tool-header");
+      }
+      this._mode = mode;
     },
 
     hideProxy: function() {
@@ -120,12 +151,32 @@
       return this._id;
     },
 
-    addWindow: function(w) {
-      this._splitter.addContent(w);
+    setTitle: function(title) {
+      this._title.text(title);
+    },
+
+    addWindow: function(wnd) {
+
+      wnd.setParent(this,null);
+      
+      this._splitter.addContent(wnd);
+      if(this._splitter.itemCount() == 1) {
+        this.setTitle(wnd.title());
+        wnd._header.hide();
+      }else{
+        this.setTitle("FDW.js") 
+        wnd._header.show();
+      }
     },
 
     getChildren: function() {
       return this._splitter.getChildren();
+      //return [this._e];//splitter.getChildren();
+    },
+
+    triggerResize: function() {
+      this._e.trigger("resize");
+      this._e.trigger("move");
     },
 
     _createSplitter: function() {
@@ -146,14 +197,7 @@
       return this._e;
     },
 
-    addContent: function(c){
-      this._splitter.addContent(c);
-      //$("<div>PANEL 1</div>").addClass("dummyRed"));
-      //this._splitter.addContent($("<div>PANEL 2</div>").addClass("dummyBlue"));
-      //this._splitter.addContent($("<div>PANEL 3</div>").addClass("dummyGreen"));
-      //this._splitter.addContent($("<div>PANEL 4</div>").addClass("dummyOrange"));
-    },
-
+    
     _mouseDownGeneral: function(e) {
       var self = e.data;
       self._e.trigger("activate");
@@ -368,7 +412,13 @@
         top = clientY - (self._startY - self._startT) + "px";
       }
 
-      this.Move(left, top, null, null, e);
+      if(self._mode == "child") {
+        self.changeWindowMode("normal");
+        self._mgr.takeMe(self,e);
+        self.$().trigger("undock");
+      }else {
+        this.Move(left, top, null, null, e);
+      }
     },
 
     _resize: function( e) {

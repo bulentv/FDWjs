@@ -19,6 +19,8 @@
       this._children = [];
       this._oldParentSize= 0;
 
+      //this.addContent();
+
     },
 
 
@@ -30,6 +32,15 @@
       this._e.bind.apply(this._e, arguments);
     },
 
+    itemCount: function() {
+      var count = this._children.length;
+      // calculate the number of windows (except the bars) so :
+      // for 5 total it should return 3
+      // for 3 total it should return 2
+      // for 1 total it should return 1
+      return Math.floor(count/2)+1;
+    },
+
     getChildren: function () {
       var ret = [];
       for(var i in this._children) {
@@ -38,7 +49,6 @@
           ret.push(c.data);
         }
       }
-      this.$().remove();
       return ret;
     },
 
@@ -112,20 +122,20 @@
           if(sfound) {
             last_s = c.data;
           }else
-          if(c.data.id() == splitter.id()) {
+          if(splitter && c.data.id() == splitter.id()) {
             sfound=true;
           }
         }
       }
 
-      var old_left_left = left_content.position().left;
-      left_content.css({
+      var old_left_left = left_content.$().position().left;
+      left_content.$().css({
         width: left - old_left_left - 2 +"px",
         position: "absolute"
       });
       if(right_content) {
-        var old_right_width = right_content.outerWidth();
-        var old_right_left = right_content.position().left;
+        var old_right_width = right_content.$().outerWidth();
+        var old_right_left = right_content.$().position().left;
 
         var new_width;
         if(!last_s) {
@@ -133,7 +143,7 @@
         }else {
           new_width = old_right_left + old_right_width - left;
         }
-        right_content.css({
+        right_content.$().css({
           left: left + 3 + "px",
           width: new_width - 3 + "px" ,
           position: "absolute"
@@ -143,6 +153,41 @@
       $(document).trigger("dmove");
 
       //console.log(total_width,left,e.data.splitter.id());
+    },
+
+    _fillSpace: function() {
+
+      var splitters = [];
+      var oldVals = [];
+      var total_width = this._e.width();
+      
+      var length = this._children.length;
+      if(length<=0) {
+        this.$().remove();
+        return;
+      }
+
+      var filled_width = this._children[length-1].data.getLeft();
+      var ratio = total_width / filled_width;
+      var s = this._children.pop();
+      s.data.$().remove();
+
+      if(length==2) {
+        this._children[0].data.$().css({
+          width:"100%"
+
+        });
+
+        return;
+      }
+
+      for(var i in this._children) {
+        var s = this._children[i];
+        if(s.type == "splitter") {
+          s.data.setLeft(s.data.getLeft() * ratio);
+          this._handleSplitterMove({data:{splitter:s.data,self:this}},s.data.getLeft());
+        }
+      }
     },
 
     makeRoom: function() {
@@ -168,8 +213,26 @@
 
     },
 
+    unDockContent: function (e) {
+      var self = e.data.self;
+      var wnd = e.data.wnd;
+      console.log("unDockContent:",e);
+      for(var i in self._children) {
+        var c = self._children[i];
+        if(c.type == "content") {
+          if(c.data.id() == wnd.id()) {
+            self._children.splice(i,(i>=(self._children.length-1))?2:1);
+            self._fillSpace();
+            return;
+          }
+        }
+      }
 
-    addContent: function(content) {
+
+    },
+
+    addContent: function(wnd) {
+
 
 
       var splitter = null;
@@ -185,19 +248,40 @@
         });
       }
 
+      var content,data;
+      if(!wnd) {
+        content = $("<div />");
+        data = content;
+      }else {
+        content = wnd.$();
+        data = wnd;
+        wnd.setBase(this.$());
+        wnd.bind("undock", {self:this,wnd:wnd}, this.unDockContent);
+      }
+
       this.makeRoom();
+
       this._children.push({
         type:"content",
-        data:content
+        data:data,
+        empty:wnd?false:true
       });
+/*
+      if(this._children.length <= 0) {
+        wnd.
+      }
+*/      
       content.css({
         float:"left",
         width:"100%",
         height:"100%",
+        left:"0px",
+        top:"0px",
         overflow:"hidden",
 //        padding:"10px",
         border:"1px solid #555"
       });
+
 
       this._e.append(content);
 

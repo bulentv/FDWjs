@@ -12,6 +12,10 @@
       return this._viewport;
     },
 
+    $: function() {
+      return this.viewport();
+    },
+
     _createViewport: function(id){
       return $("<div />")
       .addClass("viewport")
@@ -52,11 +56,30 @@
       }
     },
 
-    takeMe: function(wnd){
+    takeMe: function(wnd,e){
       console.log("takeMe:",wnd);
+
+      wnd.$().css({
+        width:wnd.$().outerWidth()+"px",
+        height:wnd.$().outerHeight()+"px"
+      });
+
+      wnd.setParent(this,e);
+      
+      var options = {
+        id: this._makeUID(),
+        title: this._makeUID(),
+        mode: "child"
+      }
+
+      var innerWnd =  this._createDockContainer(options);
+      wnd.addWindow(innerWnd);
       this._windowObjs.push(wnd);
       this._windowIds[wnd.$().attr("id")] = wnd;
       this._viewport.append(wnd.$());
+      console.log(wnd.$().position());
+      console.log(wnd.$().position());
+      wnd.setZIndex(this.incrZIndex());
     },
 
     incrZIndex: function(){
@@ -75,24 +98,39 @@
 
     addWindow: function (options){
       var self = this;
+      var wnd = this._createDockContainer(options);
+      
+      self._windowIds[options.id] = wnd;
+      self._windowObjs.push(wnd);
+      self._viewport.append(wnd.$());
+      wnd.setZIndex(self.incrZIndex());
+
+      options.id = self._makeUID();
+      options.title = self._makeUID();
+      options.mode = "child";
+      var innerWnd =  this._createDockContainer(options);
+      wnd.addWindow(innerWnd);
+
+      return wnd;
+    },
+
+    _createDockContainer: function(options){
+      var self = this;
 
       options = options || {};
 
       options.id = options.id || self._makeUID();
 
       options.parent = self;
-      //var wnd = new bulo.DockWindow(options);
+      options.mgr = self;
       var wnd = new BULO.DockContainer(options);
 
-      self._windowIds[options.id] = wnd;
-      self._windowObjs.push(wnd);
+      
 
-      self._viewport.append(wnd.$());
 
-      wnd.setZIndex(self.incrZIndex());
+      //wnd.addContent($("<div>PANEL 2</div>"));//.addClass("dummyOrange"));
 
-      wnd.addContent($("<div>PANEL 2</div>"));//.addClass("dummyOrange"));
-      wnd.addContent($("<div id='"+options.id+"'></div>"));//.addClass("dummyGreen"));
+      //$("<div id='"+options.id+"'></div>"));//.addClass("dummyGreen"));
 
       wnd.$().css({
         width: options.width+"px",
@@ -206,7 +244,7 @@
 
         var sourceWnd = e.data;
         var destWnd = self._last_wnd;
-        if(destWnd._proxy) {
+        if(destWnd && destWnd._proxy) {
           var activeBtn = destWnd._proxy.getActiveBtn();
           destWnd._proxy.remove();
           destWnd._proxy = null;
@@ -215,16 +253,25 @@
             case BULO.dockBtnType.CENTER:
               console.log("CENTER");break;
             case BULO.dockBtnType.RIGHT:
+      
+      
+
               if(!sourceWnd._taken) {
                 if(destWnd) {
                   self.removeMe(sourceWnd);
+
+
+
+                  //wnd.setZIndex(self.incrZIndex());
                   var children = sourceWnd.getChildren();
                   for(var i in children){
-                    destWnd.addWindow(children[i]);
+                    var wnd = children[i];
+                    destWnd.addWindow(wnd);
+                    wnd.changeWindowMode("child");
+                    wnd.triggerResize();
                   }
                   sourceWnd.$().remove();
 
-                  sourceWnd._taken = true;
                 }
               }
             case BULO.dockBtnType.LEFT:

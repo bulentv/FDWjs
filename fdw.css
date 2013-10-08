@@ -99,6 +99,11 @@ html, body {
   border:1px solid #888;  
   background-color:rgba(64,64,64,0.9);
 }
+
+.tool-pane{
+  padding:20px 0px 0px 0px !important;
+  border:0px !important;
+}
 .rounded-corners {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -119,6 +124,12 @@ html, body {
   -o-transition:background 0.3s;
   transition:background 0.3s;
 }
+.tool-header{
+  height:15px !important;
+  top:0px !important;
+  left:0px !important;
+  right:0px !important;
+}
 
 .header:hover {
   background-color:rgba(200,200,200,0.3);
@@ -138,7 +149,12 @@ html, body {
   left:0;
   right:0;
   bottom:0;
-  height:15px;
+  height:100%;
+}
+
+.tool-title{
+  font-size: 10px !important;
+  top:2px !important;
 }
 /* End of DockContainer specific definitions */
 
