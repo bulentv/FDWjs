@@ -7,8 +7,8 @@ This is my first project on GH. I will try to create a docking/floating windows 
 
 The project is open for pull requests &amp; contributions.
 
-<a href="http://www.bvnet.net/demo/FDWjs/">DEMO</a>
-===================================================
+Tough the library is still in early stage, you can take a look ath the <a href="http://www.bvnet.net/demo/FDWjs/">demo</a> page for the current status.
+
 
 Features Implemented
 ========
