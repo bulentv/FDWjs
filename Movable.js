@@ -30,8 +30,20 @@
       this._startL = 0;
       this._startT = 0;
 
+      this._leftLimit = -1;
+      this._rightLimit = -1;
+      this._topLimit = -1;
+      this._bottomLimit = -1;
+
       this._id = Math.random();
 
+    },
+
+    setLimits: function(l, r, t, b) {
+      this.leftLimit = l;
+      this.rightLimit = r;
+      this.topLimit = t;
+      this.bottomLimit = b;
     },
 
     id: function() {
@@ -101,15 +113,37 @@
 
       var baseOffset = self._base.offset();
 
+
+
       var calcLeft =  Math.min(Math.max( 0, e.clientX - self._startX + self._startL),self._base.outerWidth()-self._e.outerWidth());
+
+      if(self._leftLimit != -1)
+        calcLeft = Math.max(self._leftLimit, calcLeft);
+
+      if(self._rightLimit != -1)
+        calcLeft = Math.min(self._rightLimit, calcLeft);
+
+
+
       var calcTop =  Math.min(Math.max( 0, e.clientY - self._startY + self._startT),self._base.outerHeight()-self._e.outerHeight());
+
+      if(self._topLimit != -1)
+        calcTop = Math.max(self._topLimit, calcTop);
+
+      if(self._bottomLimit != -1)
+        calcTop = Math.min(self._bottomLimit, calcTop);
+
+
+
+      self._e.trigger("move",[calcLeft,calcTop, self]);
+
+
 
       self._e.css({
         left: calcLeft+"px",
         top: calcTop+"px"
       });
 
-      self._e.trigger("move",[calcLeft,calcTop, self]);
     }
 
   };
