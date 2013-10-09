@@ -60,6 +60,14 @@
       return this._e.position().left;
     },
     
+    setTop: function(top) {
+      this._e.css({top:top+"px"});
+      this.triggerMove();
+    },
+    
+    getTop: function(){
+      return this._e.position().top;
+    },
     _upHandler: function(e) {
       var self = e.data;
 

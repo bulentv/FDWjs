@@ -12,6 +12,7 @@
       this._parent = options.parent;
 
       this._parent.$().append(this._e);
+      this._direction = options.direction;
 
       // get notifed when parent resizes 
       this._parent.bind("resize", this, this._onParentResize);
@@ -58,7 +59,12 @@
     _onParentResize: function(e) {
 
       var self = e.data;
-      var newParentSize = self._e.width();
+      var newParentSize;
+      if(self._direciton == "h") {
+        newParentSize = self._e.width();
+      }else {
+        newParentSize = self._e.height();
+      }
 
       if(self._oldParentSize <= 0) {
         self._oldParentSize = newParentSize;
@@ -72,28 +78,123 @@
       for(var i in self._children) {
         var s = self._children[i];
         if(s.type == "splitter") {
-          s.data.setLeft(s.data.getLeft() * multiplier);
+          if(this._direction == "h") {
+            s.data.setLeft(s.data.getLeft() * multiplier);
+          }else {
+            s.data.setTop(s.data.getTop() * multiplier);
+          }
           s.data.triggerMove();
         }
       }
 
     },
+    
+    direction: function() {
+      return this._direction;
+    },
+
 
     _createSplitter: function() {
 
+      var width,height;
+      if(this._direction == "h") {
+        width = "6px";
+        height = "100%";
+        cursor = "e-resize";
+      }else if (this._direction == "v") {
+        width = "100%";
+        height = "6%";
+        cursor = "n-resize";
+      }
+
       return new BULO.Movable({
         base: this._e,
-        width:"6px",
-        height:"100%",
+        width:width,
+        height:height,
         right:"0px",
         top:"0px",
         class:"splitter-handle",
-        cursor: "e-resize"
+        cursor: cursor
       });
 
     },
 
-    _handleSplitterMove: function(e, left) {
+    _handleSplitterMove: function (e, left, top)
+    {
+      var self = e.data.self;
+      if(self._direction == "h") {
+        return self._handleSplitterMoveHor(e,left);
+      }else {
+        return self._handleSplitterMoveVer(e,top);
+      }
+    },
+
+    _handleSplitterMoveVer: function(e, top) {
+      // increase the left value by the half of the 
+      // splitter object width
+      top += 3;
+
+
+      var self = e.data.self,
+      splitter = e.data.splitter,
+
+      items_before = [],
+      items_after = [],
+      ratio,
+
+      total_height = self._e.height(),
+
+      sfound = false;
+
+      var top_content, bottom_content, last_s;
+      for(var i in self._children) {
+        var c = self._children[i];
+        if(c.type == "content") {
+          if(!sfound) {
+            top_content = c.data;
+          }else{
+            if(!bottom_content)
+              bottom_content = c.data;
+          }
+        }else {
+          if(sfound) {
+            last_s = c.data;
+          }else
+          if(splitter && c.data.id() == splitter.id()) {
+            sfound=true;
+          }
+        }
+      }
+
+      var old_top_top = top_content.$().position().top;
+      top_content.$().css({
+        height: top - old_top_top - 2 +"px",
+        position: "absolute"
+      });
+      if(bottom_content) {
+        var old_bottom_height = bottom_content.$().outerHeight();
+        var old_bottom_top = bottom_content.$().position().top;
+
+        var new_height;
+        if(!last_s) {
+          new_height = total_height - top;
+        }else {
+          new_height = old_bottom_top + old_bottom_height - top;
+        }
+        bottom_content.$().css({
+          top: top + 3 + "px",
+          height: new_height - 3 + "px" ,
+          position: "absolute"
+        });
+      }
+      self.$().trigger("smove");
+      $(document).trigger("dmove");
+
+      //console.log(total_width,left,e.data.splitter.id());
+    },
+
+    _handleSplitterMoveHor: function (e, left) {
+
 
       // increase the left value by the half of the 
       // splitter object width
@@ -185,17 +286,28 @@
 
       
       if(splitters.length == 0) {
-        this.$().children().css({
-          width:"100%",
-          left:"0px"
-        });
+        if(this._direction == "h") {
+          this.$().children().css({
+            width:"100%",
+            left:"0px"
+          });
+        }else {
+          this.$().children().css({
+            height:"100%",
+            top:"0px"
+          });
+        }
         if(this._children.length == 1){
           this._children[0].data.hideTitle();
           this._parent.getTitleFromInner();
         }
 
       }else {
-        this._children[0].data.$().css({left:"0px"});
+        if(this._direction) {
+          this._children[0].data.$().css({left:"0px"});
+        }else {
+          this._children[0].data.$().css({top:"0px"});
+        }
         for(var i in splitters) {
           splitters[i].triggerMove();
         }
@@ -218,7 +330,11 @@
       for(var i in this._children) {
         var s = this._children[i];
         if(s.type == "splitter") {
-          s.data.setLeft(s.data.getLeft() * (1-(1/(contents+1))) );
+          if(this._direction == "h") {
+            s.data.setLeft(s.data.getLeft() * (1-(1/(contents+1))) );
+          }else {
+            s.data.setTop(s.data.getTop() * (1-(1/(contents+1))) );
+          }
           s.data.triggerMove();
         }
       }
@@ -281,7 +397,7 @@
 
     },
 
-    addContent: function(wnd) {
+    addContent: function(wnd,place) {
 
 
 
@@ -301,8 +417,13 @@
       var content,data;
       content = wnd.$();
       data = wnd;
-      wnd.setBase(this.$());
-      wnd.bind("undock", {self:this,wnd:wnd}, this.unDockContent);
+
+      // check if this is another splitter or DockContainer object
+      // better check required here
+      if(wnd.setBase) {
+        wnd.setBase(this.$());
+        wnd.bind("undock", {self:this,wnd:wnd}, this.unDockContent);
+      }
 
       this.makeRoom();
 
@@ -335,7 +456,9 @@
         for(var i in this._children) {
           var child = this._children[i];
           if(child.type == "content") {
-            child.data.showTitle();
+
+            if(child.data.showTitle)
+              child.data.showTitle();
           }
         }
         console.log("show sub title");

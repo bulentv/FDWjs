@@ -45,10 +45,12 @@
 
       this._e.append(this._header);
 
+      this._horRootSplitter = this._createHorizontalSplitter();
+      this._verRootSplitter = this._createVerticalSplitter();
+      this._verRootSplitter.addContent(this._horRootSplitter);
       
-      this._createSplitter();
       if(options.content) {
-        this._splitter.$().append($(options.content));
+        this._horRootSplitter.$().append($(options.content));
       }
 
       this._state = "";
@@ -95,10 +97,10 @@
     },
 
     getTitleFromInner: function() {
-      if(this._splitter._children.length != 1) {
+      if(this._horRootSplitter._children.length != 1) {
         console.log("ERROR children == 1 here");
       }else {
-        this.setTitle(this._splitter._children[0].data.title());
+        this.setTitle(this._horRootSplitter._children[0].data.title());
       }
     },
 
@@ -210,17 +212,39 @@
       */
     },
 
-    addWindow: function(wnd) {
-
-      wnd._splitter._e.append(this._splitter._e.children("#_c"));
-
+    addWindow: function(wnd, place) {
+      
       wnd.setParent(this,null);
-      this._splitter.addContent(wnd);
-      this.fixTitles(wnd);
+
+      switch(place) {
+      case "child":
+        
+        // splitter's original non-pane content should be
+        // moved into a side first, if there is any
+        wnd._horRootSplitter._e.append(this._horRootSplitter._e.children("#_c"));
+
+        this._horRootSplitter.addContent(wnd);
+        this.fixTitles(wnd);
+        break;
+
+      case "right":
+        this._horRootSplitter.addContent(wnd);
+        this.fixTitles(wnd);
+        break;
+
+      case "bottom":
+        this._verRootSplitter.addContent(wnd);
+        this.fixTitles(wnd);
+        break;
+
+      default:
+        console.log("Unknown place:"+place);
+        break;
+      }
     },
 
     getChildren: function() {
-      return this._splitter.getChildren();
+      return this._horRootSplitter.getChildren();
       //return [this._e];//splitter.getChildren();
     },
 
@@ -229,20 +253,44 @@
       this._e.trigger("move");
     },
 
-    _createSplitter: function() {
+    _createHorizontalSplitter: function() {
       
       var self = this;
       
-      this._splitter = new BULO.Splitter({
-        parent: this
+      var splitter = new BULO.Splitter({
+        parent: this,
+        direction: "h"
       });
       
-      this._splitter.bind("smove",this._splitter, function (e) {
+      splitter.bind("smove",this._splitter, function (e) {
         self.$().trigger("smove");  
       });
-      this._splitter.bind("hide_main_title", function () {
+      splitter.bind("hide_main_title", function () {
         self.setTitle("FDW.js");
       });
+      return splitter;
+    },
+
+    // returns main jQuery object this object build on top of
+    $: function() {
+      return this._e;
+    },
+    _createVerticalSplitter: function() {
+      
+      var self = this;
+      
+      var splitter = new BULO.Splitter({
+        parent: this,
+        direction: "v"
+      });
+      
+      splitter.bind("smove",this._splitter, function (e) {
+        self.$().trigger("smove");  
+      });
+      splitter.bind("hide_main_title", function () {
+        self.setTitle("FDW.js");
+      });
+      return splitter;
     },
 
     // returns main jQuery object this object build on top of

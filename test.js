@@ -12,15 +12,24 @@ var mgr = new BULO.WindowManager();
 
 var panelsToCreate = 5;
 for(var i=0;i<panelsToCreate;i++) {
+  var r = randomBetween(100,155)
+  var g = randomBetween(100,155)
+  var b = randomBetween(100,155)
   mgr.addWindow({
     left:300 * (Math.random()*5),
     top:100 * (Math.random()*8),
     width:400,
     height:300,
     title:"Window " + (i+1),
-    content: $("<div id='_c'>Default Content</div>")
+    content: $("<div id='_c' style='width:100%;height:100%;color:black;background-color:rgba("+r+","+g+","+b+",1)'>Default Content</div>")
+    
   });
 
+}
+
+function randomBetween(from,to)
+{
+      return Math.floor(Math.random()*(to-from+1)+from);
 }
 
 /*

@@ -74,7 +74,7 @@
 
       var innerWnd =  this._createDockContainer(options);
 
-      wnd.addWindow(innerWnd);
+      wnd.addWindow(innerWnd,"child");
       
       this._windowObjs.push(wnd);
       this._windowIds[wnd.$().attr("id")] = wnd;
@@ -119,7 +119,7 @@
       self._viewport.append(wnd.$());
       wnd.setZIndex(self.incrZIndex());
 
-      wnd.addWindow(innerWnd);
+      wnd.addWindow(innerWnd,"child");
 
       return wnd;
     },
@@ -277,7 +277,7 @@
                   for(var i in children){
                     var wnd = children[i];
                     wnd.showTitle();
-                    destWnd.addWindow(wnd);
+                    destWnd.addWindow(wnd,"right");
                     wnd.changeWindowMode("child");
                     wnd.triggerResize();
                   }
@@ -290,6 +290,26 @@
             case BULO.dockBtnType.TOP:
               console.log("TOP");break;
             case BULO.dockBtnType.BOTTOM:
+              
+              if(!sourceWnd._taken) {
+                if(destWnd) {
+                  self.removeMe(sourceWnd);
+
+
+
+                  // DOCKING
+                  var children = sourceWnd.getChildren();
+                  for(var i in children){
+                    var wnd = children[i];
+                    wnd.showTitle();
+                    destWnd.addWindow(wnd,"bottom");
+                    wnd.changeWindowMode("child");
+                    wnd.triggerResize();
+                  }
+                  sourceWnd.$().remove();
+
+                }
+              }
               console.log("BOTTOM");break;
             default:
               console.log("Unknown Btn");break;
