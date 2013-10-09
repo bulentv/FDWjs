@@ -30,10 +30,17 @@
       this._title = $("<div unselectable='on'>"+this._titletext+"</div>").addClass("title"); 
       this._title.attr("unselectable","on");
       this._header = $("<div></div>").addClass("header");
+      if(options.hideTitle) {
+        this.hideTitle();
+      }
       this._header.append(this._title);
       if(options.mode == "child") {
         this.changeWindowMode("child");
       }
+
+      $(document).bind("bping",function() {
+        console.log("bpong!");
+      });
 
 
       this._e.append(this._header);
@@ -71,6 +78,30 @@
 
     },
 
+    hideTitle: function () {
+      this._header.hide();
+      
+      this.$()
+      .addClass("hidden-tool-pane")
+      .removeClass("tool-pane");
+    },
+
+    showTitle: function () {
+      this._header.show();
+      
+      this.$()
+      .addClass("tool-pane")
+      .removeClass("hidden-tool-pane");
+    },
+
+    getTitleFromInner: function() {
+      if(this._splitter._children.length != 1) {
+        console.log("ERROR children == 1 here");
+      }else {
+        this.setTitle(this._splitter._children[0].data.title());
+      }
+    },
+
     setParent: function(parent,e){
       this._old_parent = this._parent;
       this._parent = parent;
@@ -103,8 +134,8 @@
     },
 
     changeWindowMode: function(mode) {
-      console.log("changing "+this._id+" to "+mode);
-      console.log(this._e,this._title,this._header);
+      //console.log("changing "+this._id+" to "+mode);
+      //console.log(this._e,this._title,this._header);
       if(mode == "normal") {
         this._e.removeClass("tool-pane");
         this._title.removeClass("tool-title");
@@ -208,6 +239,9 @@
       
       this._splitter.bind("smove",this._splitter, function (e) {
         self.$().trigger("smove");  
+      });
+      this._splitter.bind("hide_main_title", function () {
+        self.setTitle("FDW.js");
       });
     },
 
@@ -335,6 +369,7 @@
         cornerLead = 15;
 
         if(self._state == "move") return;
+        if(self._mode == "child") return;
 
         if(e.clientX > left && e.clientX < right && e.clientY > top && e.clientY < bottom) {
 

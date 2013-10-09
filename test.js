@@ -1,3 +1,7 @@
+window.bping = function() {
+  $(document).trigger("bping");
+};
+
 $(document).ready(function() {
     $(document).bind('mousedown selectstart', function(e) {
         return $(e.target).is('input, textarea, select, option');

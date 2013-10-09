@@ -104,6 +104,10 @@ html, body {
   padding:20px 0px 0px 0px !important;
   border:0px !important;
 }
+.hidden-tool-pane{
+  padding:0px 0px 0px 0px !important;
+  border:0px !important;
+}
 .rounded-corners {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;

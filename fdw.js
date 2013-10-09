@@ -63,15 +63,17 @@
         width:wnd.$().outerWidth()+"px",
         height:wnd.$().outerHeight()+"px"
       });
-
+      
       wnd.setParent(this,e);
 
       var options = {};
       options.id = this._makeUID();
-      options.title = this._makeUID();
       options.mode = "child";
+      options.title = wnd.title();
+      options.hideTitle = true;
 
       var innerWnd =  this._createDockContainer(options);
+
       wnd.addWindow(innerWnd);
       
       this._windowObjs.push(wnd);
@@ -100,14 +102,15 @@
       var self = this;
       
       options.id = self._makeUID();
-      options.title = self._makeUID();
+//      options.title = self._makeUID();
       options.mode = "normal";
       var wnd = this._createDockContainer(options);
       
       options.id = self._makeUID();
-      options.title = self._makeUID();
+//      options.title = self._makeUID();
       options.mode = "child";
       options.content = null;
+      options.hideTitle = true;
       var innerWnd =  this._createDockContainer(options);
 
       
@@ -273,6 +276,7 @@
                   var children = sourceWnd.getChildren();
                   for(var i in children){
                     var wnd = children[i];
+                    wnd.showTitle();
                     destWnd.addWindow(wnd);
                     wnd.changeWindowMode("child");
                     wnd.triggerResize();
