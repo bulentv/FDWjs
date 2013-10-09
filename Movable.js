@@ -40,10 +40,10 @@
     },
 
     setLimits: function(l, r, t, b) {
-      this.leftLimit = l;
-      this.rightLimit = r;
-      this.topLimit = t;
-      this.bottomLimit = b;
+      this._leftLimit = l;
+      this._rightLimit = r;
+      this._topLimit = t;
+      this._bottomLimit = b;
     },
 
     id: function() {
