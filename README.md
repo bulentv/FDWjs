@@ -31,7 +31,7 @@ If you notice that you can improve any part of the code, please do request a pul
 
 I also would like to remove all third party library dependencies. (Mostly jQuery, for panel contents, there will be some other libraries of course - Webix, jQuery UI, Sencha etc.)
 
-Why building another layout library more?
+Why building yet another layout library?
 =========================================
 I couldn't find any library / framework that covers this kind of flexible / floating / docking layout functionality. That's why I started this project.
 
