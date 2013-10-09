@@ -1,7 +1,7 @@
 FDWjs
 =====
 
-Javascript Floating &amp; Docking Windows
+Javascript Floating &amp; Docking Layout Library
 
 This is my first project on GH. I will try to create a docking/floating windows library in Javascript.
 
