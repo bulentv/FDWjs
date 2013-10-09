@@ -39,3 +39,15 @@ Soon
 ====
 - Documentation
 - A fully working demo page
+
+IE 8+ Support?
+==============
+Why not, maybe.
+
+<i>"Windows is very important, just like PHP"</i> -- Ryan Dahl
+
+IE 8- Support?
+==============
+I don't feel myself that crazy yet.
+
+
