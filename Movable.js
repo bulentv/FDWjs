@@ -34,6 +34,10 @@
       this._rightLimit = -1;
       this._topLimit = -1;
       this._bottomLimit = -1;
+      this._lockX = false;
+      this._lockY = false;
+
+      this.setLockX(true);
 
       this._id = Math.random();
 
@@ -53,6 +57,20 @@
 
     setBottomLimit: function(b){
       this._bottomLimit = b;
+    },
+
+    setLockX: function (lock) {
+      if(lock !== false) {
+        lock = true;
+      }
+      this._lockX = lock;
+    },
+
+    setLockY: function (lock) {
+      if(lock !== false) {
+        lock = true;
+      }
+      this._lockY = lock;
     },
 
     id: function() {
@@ -124,36 +142,41 @@
 
       var baseOffset = self._base.offset();
 
+      var pos = {};
+      if(!self._lockX) {
+
+        pos.left =  Math.min(Math.max( 0, e.clientX - self._startX + self._startL),self._base.outerWidth()-self._e.outerWidth());
+
+        if(self._leftLimit != -1)
+          pos.left = Math.max(self._leftLimit, pos.left);
+
+        if(self._rightLimit != -1)
+          pos.left = Math.min(self._rightLimit, pos.left);
+
+        pos.left += "px";
+
+      }
 
 
-      var calcLeft =  Math.min(Math.max( 0, e.clientX - self._startX + self._startL),self._base.outerWidth()-self._e.outerWidth());
+      if(!self._lockY) {
 
-      if(self._leftLimit != -1)
-        calcLeft = Math.max(self._leftLimit, calcLeft);
+        pos.top =  Math.min(Math.max( 0, e.clientY - self._startY + self._startT),self._base.outerHeight()-self._e.outerHeight());
 
-      if(self._rightLimit != -1)
-        calcLeft = Math.min(self._rightLimit, calcLeft);
+        if(self._topLimit != -1)
+          pos.top = Math.max(self._topLimit, pos.top);
 
+        if(self._bottomLimit != -1)
+          pos.top = Math.min(self._bottomLimit, pos.top);
 
+        pos.top += "px";
+      }
 
-      var calcTop =  Math.min(Math.max( 0, e.clientY - self._startY + self._startT),self._base.outerHeight()-self._e.outerHeight());
-
-      if(self._topLimit != -1)
-        calcTop = Math.max(self._topLimit, calcTop);
-
-      if(self._bottomLimit != -1)
-        calcTop = Math.min(self._bottomLimit, calcTop);
-
-
-
-      self._e.trigger("move",[calcLeft,calcTop, self]);
-
-
-
-      self._e.css({
-        left: calcLeft+"px",
-        top: calcTop+"px"
-      });
+      self._e.css(pos);
+      
+      self._e.trigger("move",
+        //we will deprecate these return values soon
+        [parseInt(pos.left),parseInt(pos.top),self]
+      );
 
     }
 
