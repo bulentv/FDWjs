@@ -89,6 +89,8 @@
       
       if(self._cursor)
         self._base.css({"cursor":"default"});
+      
+      self._e.trigger("aftermove");
 
     },
 
