@@ -257,7 +257,7 @@
       
       var self = this;
       
-      var splitter = new BULO.Splitter({
+      var splitter = new BULO.SplitterOld({
         parent: this,
         direction: "h"
       });
@@ -279,7 +279,7 @@
       
       var self = this;
       
-      var splitter = new BULO.Splitter({
+      var splitter = new BULO.SplitterOld({
         parent: this,
         direction: "v"
       });

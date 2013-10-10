@@ -2,11 +2,11 @@
 
   var BULO = window.BULO = window.BULO || {};
 
-  BULO.Splitter = function(options) {
+  BULO.SplitterOld = function(options) {
     this._init(options);
   };
 
-  BULO.Splitter.prototype = {
+  BULO.SplitterOld.prototype = {
     _init: function(options) {
       this._e = $("<div class='splitter-root'></div>");
       this._parent = options.parent;

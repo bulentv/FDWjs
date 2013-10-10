@@ -6,6 +6,9 @@ $(document).ready(function() {
     $(document).bind('mousedown selectstart', function(e) {
         return $(e.target).is('input, textarea, select, option');
     });
+
+
+    initNewSplitter();
 //var BULO = window.BULO || {};    
  
 var mgr = new BULO.WindowManager();
@@ -16,16 +19,30 @@ for(var i=0;i<panelsToCreate;i++) {
   var g = randomBetween(100,155)
   var b = randomBetween(100,155)
   mgr.addWindow({
-    left:300 * (Math.random()*5),
+    left:100 * (Math.random()*5),
     top:100 * (Math.random()*8),
     width:400,
     height:300,
     title:"Window " + (i+1),
-    content: $("<div id='_c' style='width:100%;height:100%;color:black;background-color:rgba("+r+","+g+","+b+",1)'>Default Content</div>")
+    content: $("<div id='_c' class='_i"+i+"' style='width:100%;height:100%;color:black;background-color:rgba("+r+","+g+","+b+",1)'>Default Content</div>")
     
   });
 
 }
+  var r = randomBetween(100,155)
+  var g = randomBetween(100,155)
+  var b = randomBetween(100,155)
+  mgr.addWindow({
+    left:100,
+    top:100,
+    width:400,
+    height:300,
+    title:"Window SP",
+    content: $("<div id='_c' class='_ii' style='width:100%;height:100%;color:black;background-color:rgba("+r+","+g+","+b+",1)'>Default Content</div>")
+    
+  });
+
+$("._ii").html("").append($("#test"));
 
 function randomBetween(from,to)
 {
