@@ -37,8 +37,6 @@
       this._lockX = false;
       this._lockY = false;
 
-      this.setLockX(true);
-
       this._id = Math.random();
 
     },
