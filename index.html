@@ -20,7 +20,7 @@
     <!-- dockwindow.js - Panel specific code -->
     <script type="text/javascript" src="DockContainer.js"></script>
     <script type="text/javascript" src="Movable.js"></script>
-    <script type="text/javascript" src="Splitter.js"></script>
+    <script type="text/javascript" src="Splitter.old.js"></script>
     
     <!-- proxy.js - Helper object to display docking buttons while dragging a panel -->
     <script type="text/javascript" src="proxy.js"></script>
@@ -31,8 +31,9 @@
   </head>
   <body>
     <!-- We don't need anything here, everyting is in the code -->
-    <div id="test">
-      TEST
+    <div id="test" style="z-index:999999;position:absolute;left:50px;top:50px;width:300px;height:30px;background-color:#aaa;">
+      Check test page for the <a href="splitter-test.html">new splitter window</a>
+      <iframe src="splitter-test.html" style="width:400px;height:600px;" />
     </div>
   </body>
 </html>

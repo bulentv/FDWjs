@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<!--
+  Created using jsbin.com
+  Source can be edited via http://jsbin.com/UpiLOxU/6/edit
+-->
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<script src="http://www.bvnet.net/demo/FDWjs/Movable.js"></script>  
+<script src="http://www.bvnet.net/demo/FDWjs/Splitter.js"></script>
+<meta charset=utf-8 />
+<title>JS Bin</title>
+
+<style id="jsbin-css">
+html,body{
+  padding:0;
+  margin:0;
+  width:100%;
+  height:100%;
+}
+.splitter-handle {
+  z-index:95;
+  position:absolute;
+  left:0px;
+  top:0px;
+  background-color:rgba(120,120,120,1);
+  -webkit-transition:background 0.6s 0.5s ease;
+  -moz-transition:background 0.6s 0.5s ease;
+  -o-transition:background 0.6s 0.5s ease;
+  transition:background 0.6s 0.5s ease;
+}
+
+.trans_base{
+
+  left:0px;
+  top:0px;
+  width:100%;
+  position:absolute;
+  height:100%;
+  z-index:9;
+
+}
+
+.sample{
+  width:100%;
+  height:100%;
+  left:0px;
+  top:0px;
+
+}
+
+.sample2{
+   background-color:white;
+  left:10px;
+  top:10px;
+  bottom:10px;
+  right:10px;
+  position:absolute;
+  overflow:hidden;
+
+  
+}
+.handle_base{
+  left:0px;
+  top:0px;
+  width:100%;
+  position:absolute;
+  height:100%; 
+}
+.base{
+  position:absolute;
+  left:0px;
+  top:0px;
+  width:100%;
+  height:100%;
+  background-color:#555;
+  overflow:hidden;
+
+}
+
+.w{
+  width:100%;
+  height:100%;
+  left:0px;
+  top:0px;
+  background-color: rgba(200,100,100,1);
+  position:absolute;
+
+}
+
+
+#w2{
+  width:100%;
+  height:100%;
+  left:0px;
+  top:0px;
+  background-color: rgba(100,200,100,1);
+  position:absolute;
+  overflow:hidden;
+}
+
+
+
+#w3{
+  width:100%;
+  height:100%;
+  left:0px;
+  top:0px;
+  background-color: rgba(100,200,200,1);
+  position:absolute;
+}
+
+
+
+
+#w4{
+  width:100%;
+  height:100%;
+  left:0px;
+  top:0px;
+  background-color: rgba(200,200,100,1);
+  position:absolute;
+}
+2
+</style>
+</head>
+<body>
+  <div id="testcontent"><div class="sample"><div class="sample2"></div></div></div>
+  <script>
+
+function randomBetween(from,to){
+  return Math.floor(Math.random()*(to-from+1)+from);
+}
+
+window.uidPrefix = "BULOSPLIT";
+window.lastUID = 0;
+window.genUID = function () {
+  
+  var newUID = ++window.lastUID;
+
+  if(window.lastUID < 10)
+    newUID = "00"+newUID;
+  else if(window.lastUID < 100)
+    newUID = "0"+newUID;
+    
+  
+  return window.uidPrefix  + "_" + newUID;
+};
+
+$(document).ready( function () {
+
+  $(document).bind('mousedown selectstart', function(e) {
+    return $(e.target).is('input, textarea, select, option');
+  });  
+  
+    
+  
+  var base = $("<div />");
+  base.addClass("base");
+  $("body").append(base);
+  
+  var sp = window.sp = new BULO.Splitter({
+    base: base
+  });
+  
+    
+  var btnV = $("<button>Add Vert. Window</button>");
+  var btnH = $("<button>Add Horz. Window</button>");
+  
+  var fixpanel = $("<div style='z-index:97;position:fixed;left:50px;top:50px;background-color:white;'></div>")
+      .append(btnV)
+      .append(btnH)
+      .appendTo($("body"));
+  
+  
+
+  btnV.on("click", function () {
+    var r = randomBetween(100,255);
+    var g = randomBetween(100,255);
+    var b = randomBetween(100,255);
+    var w = $("<div class='w'></div>").html($("#testcontent").html()).css({
+      "background-color": "rgba("+r+","+g+","+b+",1)",
+      width: "100%",
+      height: "100%",
+      left: "0px",
+      top: "0px",
+      position: "absolute"
+    });
+      
+    sp.addWindow(w,"n");
+  });
+  
+  btnH.on("click", function () {
+    var r = randomBetween(100,255);
+    var g = randomBetween(100,255);
+    var b = randomBetween(100,255);
+    var w = $("<div class='w'></div>").html($("#testcontent").html()).css({
+      "background-color": "rgba("+r+","+g+","+b+",1)",
+      width: "100%",
+      height: "100%",
+      left: "0px",
+      top: "0px",
+      position: "absolute"
+    });
+      
+    sp.addWindow(w,"w");
+  });
+  
+    
+});
+</script>
+
+</body>
+</html>
