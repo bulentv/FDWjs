@@ -1,5 +1,5 @@
 (function () {
-  
+
   window["BULO"] = window["BULO"] || {};
   window["BULO"]["Splitter"] = function (options) {
     this._init(options);
@@ -42,6 +42,7 @@
       
       // add the rule to the rules table
       this._connections.push({
+        uid:window.genUID(),
         handle:handle,
         srcVal:srcVal,
         dst:dstObj,
@@ -65,6 +66,45 @@
         
       }
       
+    },
+    
+    _deleteConnection: function(connection){
+      for(var i in this._connections) {
+        if(this._connections[i] == connection) {
+          this._connections.splice(i,1);
+          return;
+        }
+      }
+      
+    },
+    
+    _getConnectionsBySrc: function (src){
+      
+      var ret = [];
+      
+      for(var i in this._connections) {
+        var c = this._connections[i];
+        if(c.src == src) {
+          ret.push(c);    
+        }
+      }
+      
+      return ret;
+      
+    },
+    
+    _getConnectionsByDst: function(dst){
+      
+      var ret = [];
+      
+      for(var i in this._connections) {
+        var c = this._connections[i];
+        if(c.dst == dst) {
+          ret.push(c);    
+        }
+      }
+      
+      return ret;
     },
     
     _afterHandleMove: function(e) {
@@ -126,6 +166,68 @@
           
         }
       }
+    },
+    
+    removeWindow: function(id){
+      
+      var element = null;
+      
+      this._base.find(".w").each(function(index,el){
+        if($(el).attr("uid") == id) {
+          element = el;
+        }
+      });
+      
+      if(element) {
+        var objConns = this._getConnectionsByDst(element);
+        
+        var handleConns_0 = this._getConnectionsBySrc(objConns[0].src);
+        var handleConns_1 = this._getConnectionsBySrc(objConns[1].src);
+        
+        handleConns_0[0].src = handleConns_1[1].src;
+        
+        var handle = handleConns_1[1].handle;
+        
+        handleConns_0[0].handle = handle;
+        
+        handle.setBottomLimit(-1);
+        handle.setTopLimit(-1);
+        handle.setLeftLimit(-1);
+        handle.setRightLimit(-1);
+        
+        
+        objConns[0].src.remove();
+        objConns[0].dst.remove();
+        
+        this._deleteConnection(objConns[0]);
+        this._deleteConnection(objConns[1]);
+        
+        
+        // trigger the after move event to re-set the limits of the neigbour handles
+        this._afterHandleMove({data:handle});
+        
+        // trigger other handle after move events to re-arrange all existing handles
+        var self = this;
+        handle.$().siblings(".splitter-handle").each(function (index,handle) {
+          self._afterHandleMove({data:$.data(handle,"handle")});
+        });
+        
+        // trigger the move event for the first time to initialize starting positions
+        handle.triggerMove();
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      
+        console.log(objConns,handleConns_0,handleConns_1);
+      }
+      
     },
     
     addWindow: function(wnd, place) {
@@ -244,6 +346,8 @@
       }
       
       this._lastWnd = wnd;
+      
+      wnd.attr("uid",window.genUID());
       
     },
     
