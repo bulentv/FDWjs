@@ -39,10 +39,19 @@
 
     },
 
-    setLimits: function(l, r, t, b) {
+    setLeftLimit: function(l){
       this._leftLimit = l;
+    },
+
+    setRightLimit: function(r){
       this._rightLimit = r;
+    },
+    
+    setTopLimit: function(t){
       this._topLimit = t;
+    },
+
+    setBottomLimit: function(b){
       this._bottomLimit = b;
     },
 
