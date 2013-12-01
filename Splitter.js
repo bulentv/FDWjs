@@ -241,7 +241,7 @@
         if(place == "n" || place == "s") {
           
           // set initial properties according to the orientation (v)
-          cursor = place + "-resize";
+          cursor = "ns" + "-resize";
           height = "6px";
           width = "100%";
           orientation = "v";
@@ -252,7 +252,7 @@
         }else if (place == "w" || place == "e") {
           
           // set initial properties according to the orientation (v)
-          cursor = place + "-resize";
+          cursor = "ew" + "-resize";
           width = "6px";
           height = "100%";
           orientation = "h";
