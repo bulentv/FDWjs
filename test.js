@@ -1,3 +1,4 @@
+/*** TEST *///
 window.bping = function() {
   $(document).trigger("bping");
 };
